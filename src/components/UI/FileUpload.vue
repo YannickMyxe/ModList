@@ -51,7 +51,7 @@ const onFileChange = async (details: FileChangeDetails): Promise<void> => {
       </FileUpload.Context>
     </FileUpload.ItemGroup>
 
-    <FileUpload.ItemGroup>
+    <FileUpload.ItemGroup type="rejected">
       <FileUpload.Context v-slot="{ rejectedFiles }">
         <FileUploadItem
           v-for="rejection in rejectedFiles"
