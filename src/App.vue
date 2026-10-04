@@ -13,7 +13,7 @@ const handleModListUploaded = (modList: ModList) => {
 </script>
 
 <template>
-  <div class="max-w-7xl mt-5 mx-auto">
+  <div class="max-w-7xl mt-5 mx-auto p-3">
     <h1 class="text-4xl">ModListItem Project</h1>
     <FileUpload @mod-list-uploaded="handleModListUploaded" />
     <ModListComponent />
