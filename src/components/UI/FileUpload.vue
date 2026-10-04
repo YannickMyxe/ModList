@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { FileUpload } from '@ark-ui/vue/file-upload'
+import { FileUpload, type FileUploadFileChangeDetails } from '@ark-ui/vue/file-upload'
 import FileUploadItem from './FileUploadItem.vue'
 import type { ModList } from "@/types/ModList.ts";
 
@@ -7,12 +7,7 @@ const emit = defineEmits<{
   (e: 'modListUploaded', modList: ModList | null): void
 }>()
 
-interface FileChangeDetails {
-  acceptedFiles: File[]
-  rejectedFiles: File[]
-}
-
-const onFileChange = async (details: FileChangeDetails): Promise<void> => {
+const onFileChange = async (details: FileUploadFileChangeDetails): Promise<void> => {
   // When a file is removed / cleared, notify parent to clear the list
   if (details.acceptedFiles.length === 0) {
     emit('modListUploaded', null)
