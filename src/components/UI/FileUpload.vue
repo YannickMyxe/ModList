@@ -3,7 +3,7 @@ import { FileUpload } from '@ark-ui/vue/file-upload'
 import type { ModList } from "@/types/ModList.ts";
 
 const emit = defineEmits<{
-  modListUploaded: [modList: ModList]
+  (e: 'modListUploaded', modList: ModList): void
 }>()
 
 interface FileChangeDetails {
@@ -12,12 +12,17 @@ interface FileChangeDetails {
 }
 
 const onFileChange = async (details: FileChangeDetails): Promise<void> => {
+  if (details.rejectedFiles.length > 0) {
+    console.warn('Rejected file(s):', details.rejectedFiles)
+    return
+  }
+
   const file = details.acceptedFiles[0]
   if (!file) return
 
   try {
     const text = await file.text()
-    const data = JSON.parse(text) as ModList
+    const data: ModList = JSON.parse(text) as ModList
     emit('modListUploaded', data)
   } catch (error) {
     console.error('Failed to parse modlist file:', error)
@@ -27,7 +32,7 @@ const onFileChange = async (details: FileChangeDetails): Promise<void> => {
 </script>
 
 <template>
-  <FileUpload.Root :maxFiles="1" @file-change="onFileChange" >
+  <FileUpload.Root :maxFiles="1" accept="application/json, .json" @file-change="onFileChange" >
     <FileUpload.Label class="font-bold">Upload modlist file</FileUpload.Label>
     <FileUpload.Dropzone class="min-w-max p-3 mt-1 mb-3 border border-gray-300 rounded-lg text-center text-xl">
       <div>Drag and drop files here (JSON only)</div>
@@ -42,6 +47,24 @@ const onFileChange = async (details: FileChangeDetails): Promise<void> => {
           <FileUpload.ItemName />
           <FileUpload.ItemSizeText />
           <FileUpload.ItemDeleteTrigger class="p-1 border border-b-slate-800 rounded-lg bg-red-200">X</FileUpload.ItemDeleteTrigger>
+        </FileUpload.Item>
+      </FileUpload.Context>
+    </FileUpload.ItemGroup>
+
+    <FileUpload.ItemGroup>
+      <FileUpload.Context v-slot="{ rejectedFiles }">
+        <FileUpload.Item
+          v-for="fileRejection in rejectedFiles"
+          :file="fileRejection.file"
+          :key="fileRejection.file.name"
+        >
+          <FileUpload.ItemName />
+          <FileUpload.ItemSizeText />
+          <div>
+            <div v-for="error in fileRejection.errors" :key="error" style="color: red">
+              {{ error }}
+            </div>
+          </div>
         </FileUpload.Item>
       </FileUpload.Context>
     </FileUpload.ItemGroup>
