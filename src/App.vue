@@ -7,8 +7,8 @@ import {ref} from "vue";
 const currentModList = ref<ModList | null>(null)
 
 const handleModListUploaded = (modList: ModList) => {
-  currentModList.value = modList
-  console.table(modList)
+  currentModList.value = modList;
+  console.table(modList);
 }
 </script>
 
@@ -16,6 +16,6 @@ const handleModListUploaded = (modList: ModList) => {
   <div class="max-w-7xl mt-5 mx-auto p-3">
     <h1 class="text-4xl">ModListItem Project</h1>
     <FileUpload @mod-list-uploaded="handleModListUploaded" />
-    <ModListComponent />
+    <ModListComponent :mod-list="currentModList" />
   </div>
 </template>
