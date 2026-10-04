@@ -4,7 +4,7 @@ import FileUploadItem from './FileUploadItem.vue'
 import type { ModList } from "@/types/ModList.ts";
 
 const emit = defineEmits<{
-  (e: 'modListUploaded', modList: ModList): void
+  (e: 'modListUploaded', modList: ModList | null): void
 }>()
 
 interface FileChangeDetails {
@@ -13,6 +13,12 @@ interface FileChangeDetails {
 }
 
 const onFileChange = async (details: FileChangeDetails): Promise<void> => {
+  // When a file is removed / cleared, notify parent to clear the list
+  if (details.acceptedFiles.length === 0) {
+    emit('modListUploaded', null)
+    return
+  }
+
   if (details.rejectedFiles.length > 0) {
     console.warn('Rejected file(s):', details.rejectedFiles)
     return

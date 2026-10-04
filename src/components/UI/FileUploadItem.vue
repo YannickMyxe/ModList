@@ -21,6 +21,8 @@ const formatError = (code: string) => {
       return 'File is too large'
     case 'TOO_MANY_FILES':
       return 'Too many files'
+    case 'FILE_EXISTS':
+      return 'This file is already uploaded'
     default:
       return code
   }
@@ -32,7 +34,7 @@ const formatError = (code: string) => {
     :file="file"
     :type="type"
     class="flex flex-row items-center justify-between gap-3 p-2.5 my-1.5 border rounded-lg transition-colors"
-    :class="type === 'rejected' ? 'border-red-300 bg-red-50 text-red-900' : 'border-gray-300 bg-gray-100'"
+    :class="type === 'rejected' ? 'border-red-300 bg-red-50 text-red-900' : 'border-gray-200 bg-gray-50'"
   >
     <div class="flex flex-col flex-1 min-w-0">
       <div class="flex items-center gap-2">
@@ -48,7 +50,7 @@ const formatError = (code: string) => {
 
     <!-- Delete / dismiss trigger -->
     <FileUpload.ItemDeleteTrigger
-      class="px-2 py-0.5 text-xs font-semibold rounded border border-gray-400 hover:bg-white transition-colors"
+      class="px-2 py-0.5 text-xs font-semibold rounded border border-gray-300 hover:bg-white transition-colors"
       :class="type === 'rejected' ? 'border-red-300 text-red-700 hover:bg-red-100' : ''"
     >
       ✕
