@@ -141,7 +141,7 @@ onUnmounted(() => {
 const downloadComparison = () => {
   if (tableRows.value.length === 0) return;
 
-  downloadJson(tableRows.value, `modlist-rating-comparison-${new Date().toISOString().slice(0, 15)}.json`);
+  downloadJson(tableRows.value, `modlist-rating-comparison-${new Date().toISOString().slice(0, 10)}.json`);
 };
 
 const downloadFilteredComparison =  () => {
