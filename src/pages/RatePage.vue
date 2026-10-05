@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import ModListComponent from "@/components/ModList/ModListComponent.vue"
-import FileUpload from "@/components/UI/FileUpload.vue";
+import ModListUpload from "@/components/ModList/ModListUpload.vue"
 import type { ModList } from "@/types/ModList.ts"
 import { ref } from "vue";
 
@@ -19,7 +19,6 @@ const handleModListUploaded = (modList: ModList | null) => {
     <p>You can also upload an already rated file to change its ratings.</p>
     <p><router-link to="/compare" class="text-sky-800 underline link">Want to compare your ratings with others?</router-link></p>
   </div>
-  <FileUpload class="mt-3" @mod-list-uploaded="handleModListUploaded" />
+  <ModListUpload class="mt-3" @mod-list-uploaded="handleModListUploaded" />
   <ModListComponent :mod-list="currentModList" />
 </template>
-

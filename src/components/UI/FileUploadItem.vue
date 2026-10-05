@@ -16,7 +16,7 @@ const props = withDefaults(
 const formatError = (code: string) => {
   switch (code) {
     case 'FILE_INVALID_TYPE':
-      return 'Invalid file type (JSON required)'
+      return 'Invalid file type'
     case 'FILE_TOO_LARGE':
       return 'File is too large'
     case 'TOO_MANY_FILES':

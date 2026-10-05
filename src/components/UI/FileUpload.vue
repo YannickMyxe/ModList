@@ -1,43 +1,28 @@
 <script setup lang="ts">
 import { FileUpload, type FileUploadFileChangeDetails } from '@ark-ui/vue/file-upload'
 import FileUploadItem from './FileUploadItem.vue'
-import type { ModList } from "@/types/ModList.ts";
 
-const emit = defineEmits<{
-  (e: 'modListUploaded', modList: ModList | null): void
+const props = defineProps<{
+  accept: string | string[]
+  label: string
+  dropzoneText: string
 }>()
 
-const onFileChange = async (details: FileUploadFileChangeDetails): Promise<void> => {
-  // When a file is removed / cleared, notify parent to clear the list
-  if (details.acceptedFiles.length === 0) {
-    emit('modListUploaded', null)
-    return
-  }
+const emit = defineEmits<{
+  (e: 'file-change', details: FileUploadFileChangeDetails): void
+}>()
 
-  if (details.rejectedFiles.length > 0) {
-    console.warn('Rejected file(s):', details.rejectedFiles)
-    return
-  }
-
-  const file = details.acceptedFiles[0]
-  if (!file) return
-
-  try {
-    const text = await file.text()
-    const data: ModList = JSON.parse(text) as ModList
-    emit('modListUploaded', data)
-  } catch (error) {
-    console.error('Failed to parse modlist file:', error)
-  }
+const onFileChange = (details: FileUploadFileChangeDetails): void => {
+  emit('file-change', details)
 }
 
 </script>
 
 <template>
-  <FileUpload.Root :maxFiles="1" accept="application/json, .json" @file-change="onFileChange">
-    <FileUpload.Label class="font-bold">Upload modlist file</FileUpload.Label>
+  <FileUpload.Root :maxFiles="1" :accept="props.accept" @file-change="onFileChange">
+    <FileUpload.Label class="font-bold">{{ props.label }}</FileUpload.Label>
     <FileUpload.Dropzone class="min-w-max p-3 mt-1 mb-3 border border-gray-300 rounded-lg text-center text-xl">
-      <div>Drag and drop files here (JSON only)</div>
+      <div>{{ props.dropzoneText }}</div>
       <div>or click to browse</div>
     </FileUpload.Dropzone>
 
@@ -56,7 +41,7 @@ const onFileChange = async (details: FileUploadFileChangeDetails): Promise<void>
       <FileUpload.Context v-slot="{ rejectedFiles }">
         <FileUploadItem
           v-for="rejection in rejectedFiles"
-          :key="rejection.file.name"
+          :key="`${rejection.file.name}-${rejection.errors.join('-')}`"
           :file="rejection.file"
           :errors="rejection.errors"
           type="rejected"
@@ -67,7 +52,3 @@ const onFileChange = async (details: FileUploadFileChangeDetails): Promise<void>
     <FileUpload.HiddenInput />
   </FileUpload.Root>
 </template>
-
-<style scoped>
-
-</style>
