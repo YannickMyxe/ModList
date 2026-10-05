@@ -6,6 +6,7 @@ import {computed, onMounted, onUnmounted, ref} from "vue";
 import YTable from "@/components/UI/YTable.vue";
 import TableFilter from "@/components/UI/TableFilter.vue";
 import YSelect from "@/components/UI/YSelect.vue";
+import {downloadJson} from "@/utils/downloadJson.ts";
 
 const modLists = ref<ModList[]>([]);
 
@@ -84,11 +85,6 @@ const calculateRating = (row: RatingRow) => {
 }
 
 const compareRatings = () => {
-  if (modLists.value.length < 2) {
-    console.warn("Not enough mod lists");
-    return;
-  }
-
   tableRows.value = [];
 
   const ratingsByMod = new Map<string, RatingRow>();
@@ -119,6 +115,7 @@ const compareRatings = () => {
 
 const onUpload = (lists: ModList[]): void => {
   modLists.value = lists;
+  compareRatings();
 }
 
 const clearData = () => {
@@ -144,49 +141,13 @@ onUnmounted(() => {
 const downloadComparison = () => {
   if (tableRows.value.length === 0) return;
 
-  const jsonString = JSON.stringify(
-    tableRows.value.map(({data, average}) => ({
-      name: data.name,
-      url: data.url,
-      ratings: data.ratings,
-      average,
-    })),
-    null,
-    2
-  );
-  const blob = new Blob([jsonString], {type: "application/json"});
-  const downloadUrl = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = downloadUrl;
-  link.download = `modlist-rating-comparison-${new Date().toISOString().slice(0, 10)}.json`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(downloadUrl);
+  downloadJson(tableRows.value, `modlist-rating-comparison-${new Date().toISOString().slice(0, 15)}.json`);
 };
 
 const downloadFilteredComparison =  () => {
   if (tableRows.value.length === 0) return;
 
-  const jsonString = JSON.stringify(
-    filteredRows.value.map(({data, average}) => ({
-      name: data.name,
-      url: data.url,
-      ratings: data.ratings,
-      average,
-    })),
-    null,
-    2
-  );
-  const blob = new Blob([jsonString], {type: "application/json"});
-  const downloadUrl = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = downloadUrl;
-  link.download = `modlist-rating-comparison-filtered-${new Date().toISOString().slice(0, 10)}.json`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(downloadUrl);
+  downloadJson(filteredRows.value, `modlist-rating-comparison-filtered-${new Date().toISOString().slice(0, 10)}.json`);
 };
 
 const tableHeads = ['Modname/Link', 'Ratings', 'Average'];
