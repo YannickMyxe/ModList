@@ -20,9 +20,28 @@ type TableRow = {
   average: number | null;
 }
 
+type RatingStrictness = "lower" | "equal" | "higher";
+
 const tableRows = ref<TableRow[]>([]);
 const searchQuery = ref("");
 const filterRating = ref<number>(-1);
+const ratingStrictness = ref<RatingStrictness>("higher");
+
+const ratingOptions: ({label: string, value: number})[] = [
+  {label: 'All', value: -1},
+  {label: 'Not Rated', value: 0},
+  {label: '1', value: 1},
+  {label: '2', value: 2},
+  {label: '3', value: 3},
+  {label: '4', value: 4},
+  {label: '5', value: 5},
+];
+
+const strictnessOptions: ({ label: string; value: RatingStrictness })[] = [
+  {label: "Lower than", value: "lower"},
+  {label: "Equal", value: "equal"},
+  {label: "Higher than", value: "higher"},
+];
 
 const filteredRows = computed(() => {
   const query = searchQuery.value.trim().toLowerCase();
@@ -31,11 +50,26 @@ const filteredRows = computed(() => {
     const matchesName =
       !query || data.name.toLowerCase().includes(query);
 
-    const matchesRating =
-      filterRating.value === -1 ||
-      (filterRating.value === 0
-        ? average === null
-        : average !== null && average >= filterRating.value);
+    let matchesRating: boolean;
+    if (filterRating.value === -1) {
+      matchesRating = true;
+    } else if (filterRating.value === 0) {
+      matchesRating = average === null;
+    } else if (average === null) {
+      matchesRating = false;
+    } else {
+      switch (ratingStrictness.value) {
+        case "lower":
+          matchesRating = average < filterRating.value;
+          break;
+        case "equal":
+          matchesRating = average === filterRating.value;
+          break;
+        case "higher":
+          matchesRating = average > filterRating.value;
+          break;
+      }
+    }
 
     return matchesName && matchesRating;
   });
@@ -118,16 +152,11 @@ const tableHeads = ['Modname/Link', 'Ratings', 'Average'];
     </div>
     <div>
       <label for="mod-rating" class="mr-2">Filter on mod rating:</label>
-      <YSelect id="mod-rating" v-model:option="filterRating" :options="[
-        {label: 'All', value: -1},
-        {label: 'Not Rated', value: 0},
-        {label: '1', value: 1},
-        {label: '2', value: 2},
-        {label: '3', value: 3},
-        {label: '4', value: 4},
-        {label: '5', value: 5},
-        ]"
-      />
+      <YSelect id="mod-rating" v-model:option="filterRating" :options="ratingOptions"/>
+    </div>
+    <div>
+      <label for="strictness" class="mr-2">Compare rating:</label>
+      <YSelect id="strictness" v-model:option="ratingStrictness" :options="strictnessOptions"/>
     </div>
   </div>
 
