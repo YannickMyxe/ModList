@@ -16,7 +16,7 @@ const props = withDefaults(
 const formatError = (code: string) => {
   switch (code) {
     case 'FILE_INVALID_TYPE':
-      return 'Invalid file type (JSON required)'
+      return 'Invalid file type'
     case 'FILE_TOO_LARGE':
       return 'File is too large'
     case 'TOO_MANY_FILES':
@@ -31,10 +31,10 @@ const formatError = (code: string) => {
 
 <template>
   <FileUpload.Item
-    :file="file"
-    :type="type"
+    :file="props.file"
+    :type="props.type"
     class="flex flex-row items-center justify-between gap-3 p-2.5 my-1.5 border rounded-lg transition-colors"
-    :class="type === 'rejected' ? 'border-red-300 bg-red-50 text-red-900' : 'border-gray-200 bg-gray-50'"
+    :class="props.type === 'rejected' ? 'border-red-300 bg-red-50 text-red-900' : 'border-gray-200 bg-gray-50'"
   >
     <div class="flex flex-col flex-1 min-w-0">
       <div class="flex items-center gap-2">
@@ -43,15 +43,15 @@ const formatError = (code: string) => {
       </div>
 
       <!-- Error messages -->
-      <div v-if="errors.length > 0" class="text-xs text-red-600 mt-0.5">
-        <span v-for="err in errors" :key="err">{{ formatError(err) }}</span>
+      <div v-if="props.errors.length > 0" class="text-xs text-red-600 mt-0.5">
+        <span v-for="err in props.errors" :key="err">{{ formatError(err) }}</span>
       </div>
     </div>
 
     <!-- Delete / dismiss trigger -->
     <FileUpload.ItemDeleteTrigger
       class="px-2 py-0.5 text-xs font-semibold rounded border border-gray-300 hover:bg-white transition-colors"
-      :class="type === 'rejected' ? 'border-red-300 text-red-700 hover:bg-red-100' : ''"
+      :class="props.type === 'rejected' ? 'border-red-300 text-red-700 hover:bg-red-100' : ''"
     >
       ✕
     </FileUpload.ItemDeleteTrigger>

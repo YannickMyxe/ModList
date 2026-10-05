@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { ModList } from "@/types/ModList.ts";
 import type { ModListItem } from "@/types/ModListItem.ts";
-import ModListTable from "@/components/ModListTable.vue";
+import ModListTable from "@/components/ModList/ModListTable.vue";
 import { computed, ref, onMounted, onUnmounted } from "vue";
+import {downloadJson} from "@/utils/downloadJson.ts";
 
 const props = defineProps<{
   modList?: ModList | ModListItem[] | null
@@ -46,18 +47,7 @@ const submitRatings = () => {
     ? ratedItems
     : { items: ratedItems }
 
-  const jsonString = JSON.stringify(exportPayload, null, 2)
-  const blob = new Blob([jsonString], { type: "application/json" })
-  const downloadUrl = URL.createObjectURL(blob)
-
-  const link = document.createElement("a")
-  link.href = downloadUrl
-  link.download = `modlist-rated-${new Date().toISOString().slice(0, 10)}.json`
-  document.body.appendChild(link)
-  link.click()
-
-  document.body.removeChild(link)
-  URL.revokeObjectURL(downloadUrl)
+  downloadJson(exportPayload, `modlist-rated-${new Date().toISOString().slice(0, 10)}.json`);
 }
 </script>
 

@@ -38,7 +38,7 @@ const tableHead = [
           <!-- Version Badge -->
           <td class="px-6 py-4 whitespace-nowrap">
             <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-mono font-medium bg-blue-50 text-blue-700 border border-blue-200/60">
-              v{{ mod.version.replace(/^v/, '') }}
+              {{ mod.version }}
             </span>
           </td>
 
