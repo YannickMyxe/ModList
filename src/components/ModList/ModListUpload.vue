@@ -44,7 +44,7 @@ const onChange = async (details: FileUploadFileChangeDetails): Promise<void> => 
     return
   }
 
-  const file = details.acceptedFiles[0]
+  const file = details.acceptedFiles[details.acceptedFiles.length - 1]
   if (!file) {
     emit('modListUploaded', null)
     return
