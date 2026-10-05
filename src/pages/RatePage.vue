@@ -17,6 +17,7 @@ const handleModListUploaded = (modList: ModList | null) => {
   <div>
     <p>Here you can rate a modlist, give each mod a score from 0-5, 5 is the best, 0.5 the worst. Giving a mod a 0 means that don't know this mod or this is a library mod and can be ignored.</p>
     <p>You can also upload an already rated file to change its ratings.</p>
+    <p>Warning: Keep in mind that progress is not saved automatically, you have to download the file.</p>
     <p><router-link to="/compare" class="text-sky-800 underline link">Want to compare your ratings with others?</router-link></p>
   </div>
   <ModListUpload class="mt-3" @mod-list-uploaded="handleModListUploaded" />
