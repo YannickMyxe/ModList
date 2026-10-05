@@ -6,6 +6,7 @@ const props = defineProps<{
   accept: string | string[];
   label: string;
   dropzoneText: string;
+  maxFiles?: number | null;
 }>()
 
 const emit = defineEmits<{
@@ -19,7 +20,11 @@ const onFileChange = (details: FileUploadFileChangeDetails): void => {
 </script>
 
 <template>
-  <ArkFileUpload.Root :maxFiles="1" :accept="props.accept" @file-change="onFileChange">
+  <ArkFileUpload.Root
+    :maxFiles="props.maxFiles === null ? Number.POSITIVE_INFINITY : props.maxFiles"
+    :accept="props.accept"
+    @file-change="onFileChange"
+  >
     <ArkFileUpload.Label class="font-bold">{{ props.label }}</ArkFileUpload.Label>
     <ArkFileUpload.Dropzone class="min-w-max p-3 mt-1 mb-3 border border-gray-300 rounded-lg text-center text-xl">
       <div>{{ props.dropzoneText }}</div>
