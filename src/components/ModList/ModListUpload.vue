@@ -10,7 +10,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'modListUploaded', modList: ModList | null): void
+  (e: 'modListUploaded', lists: ModList[]): void
 }>()
 
 const errorMessage = ref<string | null>(null)
@@ -39,42 +39,39 @@ const onChange = async (details: FileUploadFileChangeDetails): Promise<void> => 
   errorMessage.value = null
 
   if (details.rejectedFiles.length > 0) {
-    emit('modListUploaded', null)
-    errorMessage.value = 'The selected file could not be accepted. Choose a JSON file.'
+    errorMessage.value = 'The selected file could not be accepted. Choose JSON files.'
     return
   }
-
-  const file = details.acceptedFiles[details.acceptedFiles.length - 1]
-  if (!file) {
-    emit('modListUploaded', null)
-    return
-  }
-
-  emit('modListUploaded', null)
 
   try {
-    const data: unknown = JSON.parse(await file.text())
-    const items = getModListItems(data)
-    const validItems: ModListItem[] = []
+    const lists = await Promise.all(
+      details.acceptedFiles.map(async (file): Promise<ModList> => {
+        const data: unknown = JSON.parse(await file.text())
+        const items = getModListItems(data)
 
-    if (!items) {
-      errorMessage.value = 'The JSON file does not contain a valid modlist.'
-      return
-    }
+        if (!items || !items.every(isModListItem)) {
+          throw new Error('The JSON file does not contain a valid modlist.')
+        }
 
-    for (const item of items) {
-      if (!isModListItem(item)) {
-        errorMessage.value = 'The JSON file does not contain a valid modlist.'
-        return
-      }
-      validItems.push(item)
-    }
+        const validItems: ModListItem[] = [];
+        for (const item of items) {
+          if (!isModListItem(item)) {
+            throw new Error('The JSON file does not contain a valid modlist.');
+          }
+          validItems.push(item);
+        }
 
-    emit('modListUploaded', { items: validItems })
+        return { items: validItems }
+      }),
+    )
+
+    emit('modListUploaded', lists)
   } catch (error) {
     errorMessage.value = error instanceof SyntaxError
-      ? 'The selected file is not valid JSON.'
-      : 'The selected file could not be read.'
+      ? 'A selected file is not valid JSON.'
+      : error instanceof Error
+        ? error.message
+        : 'A selected file could not be read.'
   }
 }
 </script>
