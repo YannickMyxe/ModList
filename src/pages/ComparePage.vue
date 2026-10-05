@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import ModListUpload from "@/components/ModList/ModListUpload.vue";
 import YButton from "@/components/UI/YButton.vue";
 import type {ModList} from "@/types/ModList.ts";
@@ -29,7 +29,7 @@ const filterRating = ref<number>(-1);
 const ratingStrictness = ref<RatingStrictness>("higher");
 const showBackToTop = ref(false);
 
-const ratingOptions: ({label: string, value: number})[] = [
+const ratingOptions: ({ label: string, value: number })[] = [
   {label: 'All', value: -1},
   {label: 'Not Rated', value: 0},
   {label: '1', value: 1},
@@ -45,10 +45,12 @@ const strictnessOptions: ({ label: string; value: RatingStrictness })[] = [
   {label: "Higher than", value: "higher"},
 ];
 
+const tableHeads = ['Modname/Link', 'Ratings', 'Average'];
+
 const filteredRows = computed(() => {
   const query = searchQuery.value.trim().toLowerCase();
 
-  return tableRows.value.filter(({ data, average }) => {
+  return tableRows.value.filter(({data, average}) => {
     const matchesName =
       !query || data.name.toLowerCase().includes(query);
 
@@ -144,28 +146,27 @@ const downloadComparison = () => {
   downloadJson(tableRows.value, `modlist-rating-comparison-${new Date().toISOString().slice(0, 10)}.json`);
 };
 
-const downloadFilteredComparison =  () => {
+const downloadFilteredComparison = () => {
   if (tableRows.value.length === 0) return;
 
   downloadJson(filteredRows.value, `modlist-rating-comparison-filtered-${new Date().toISOString().slice(0, 10)}.json`);
 };
-
-const tableHeads = ['Modname/Link', 'Ratings', 'Average'];
 </script>
 
 <template>
   <h1 class="text-3xl">Compare 2 versions and see the differences</h1>
-  <ModListUpload :max-files="null" @mod-list-uploaded="onUpload" />
+  <ModListUpload :max-files="null" @mod-list-uploaded="onUpload"/>
   <div class="flex justify-between">
-    <YButton class="my-5" @click="compareRatings" label="Compare ratings" />
-    <YButton class="my-5" @click="clearData" label="Clear Data" />
+    <YButton class="my-5" label="Compare ratings" @click="compareRatings"/>
+    <YButton class="my-5" label="Clear Data" @click="clearData"/>
   </div>
 
   <div v-if="tableRows.length > 0" class="mt-6">
     <!-- Header with item count badge -->
     <div class="flex items-center justify-between mb-3">
       <h2 class="text-xl font-semibold text-gray-800">Mod List</h2>
-      <span class="px-2.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 rounded-full border border-gray-200">
+      <span
+        class="px-2.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 rounded-full border border-gray-200">
         {{ tableRows.length }} {{ tableRows.length === 1 ? 'mod' : 'mods' }}
       </span>
     </div>
@@ -173,19 +174,18 @@ const tableHeads = ['Modname/Link', 'Ratings', 'Average'];
 
   <div class="mb-3 flex flex-row flex-wrap gap-5">
     <div>
-      <label for="mod-filter" class="mr-2">Filter on mod name:</label>
-      <TableFilter id="mod-filter" v-model="searchQuery" placeholder="Filter mods..." />
+      <label class="mr-2" for="mod-filter">Filter on mod name:</label>
+      <TableFilter id="mod-filter" v-model="searchQuery" placeholder="Filter mods..."/>
     </div>
     <div>
-      <label for="mod-rating" class="mr-2">Filter on mod rating:</label>
+      <label class="mr-2" for="mod-rating">Filter on mod rating:</label>
       <YSelect id="mod-rating" v-model:option="filterRating" :options="ratingOptions"/>
     </div>
     <div>
-      <label for="strictness" class="mr-2">Compare rating:</label>
+      <label class="mr-2" for="strictness">Compare rating:</label>
       <YSelect id="strictness" v-model:option="ratingStrictness" :options="strictnessOptions"/>
     </div>
   </div>
-
 
 
   <div class="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-xs mb-9">
@@ -197,9 +197,9 @@ const tableHeads = ['Modname/Link', 'Ratings', 'Average'];
       >
         <td><a
           :href="row.data.url"
-          target="_blank"
-          rel="noopener noreferrer"
           class="px-5 inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+          rel="noopener noreferrer"
+          target="_blank"
         >
           <span class="truncate">{{ row.data.name }}</span>
           <span class="text-xs">↗</span>
@@ -215,7 +215,7 @@ const tableHeads = ['Modname/Link', 'Ratings', 'Average'];
             'px-6 py-4 font-medium whitespace-nowrap',
             row.average === null ? 'text-gray-400' : 'text-gray-900',
           ]"
-          >
+        >
           {{ row.average === null ? 'Not rated' : row.average.toFixed(1) }}
         </td>
       </tr>
@@ -234,32 +234,38 @@ const tableHeads = ['Modname/Link', 'Ratings', 'Average'];
 
   <div v-if="tableRows.length > 0" class="mb-8 flex justify-end gap-3">
     <button
+      class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
       type="button"
       @click="scrollToTop"
-      class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+           xmlns="http://www.w3.org/2000/svg">
+        <path d="M5 10l7-7m0 0l7 7m-7-7v18" stroke-linecap="round" stroke-linejoin="round"
+              stroke-width="2"/>
       </svg>
       Back to top
     </button>
     <button
+      class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-xs transition-colors cursor-pointer"
       type="button"
       @click="downloadComparison"
-      class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-xs transition-colors cursor-pointer"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+           xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-linecap="round" stroke-linejoin="round"
+              stroke-width="2"/>
       </svg>
       Download Comparison
     </button>
     <button
+      class="inline-flex items-center gap-2 px-4 py-2 bg-sky-800 hover:bg-sky-700 text-white text-sm font-medium rounded-lg shadow-xs transition-colors cursor-pointer"
       type="button"
       @click="downloadFilteredComparison"
-      class="inline-flex items-center gap-2 px-4 py-2 bg-sky-800 hover:bg-sky-700 text-white text-sm font-medium rounded-lg shadow-xs transition-colors cursor-pointer"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+           xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-linecap="round" stroke-linejoin="round"
+              stroke-width="2"/>
       </svg>
       Download Filtered Comparison
     </button>
@@ -275,14 +281,16 @@ const tableHeads = ['Modname/Link', 'Ratings', 'Average'];
   >
     <button
       v-show="showBackToTop"
+      aria-label="Back to top"
+      class="fixed bottom-6 right-6 p-3 bg-white/95 hover:bg-white text-gray-700 hover:text-blue-600 border border-gray-200 rounded-full shadow-lg backdrop-blur-xs transition-all hover:shadow-xl hover:-translate-y-0.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 z-50"
+      title="Back to top"
       type="button"
       @click="scrollToTop"
-      aria-label="Back to top"
-      title="Back to top"
-      class="fixed bottom-6 right-6 p-3 bg-white/95 hover:bg-white text-gray-700 hover:text-blue-600 border border-gray-200 rounded-full shadow-lg backdrop-blur-xs transition-all hover:shadow-xl hover:-translate-y-0.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 z-50"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+           xmlns="http://www.w3.org/2000/svg">
+        <path d="M5 10l7-7m0 0l7 7m-7-7v18" stroke-linecap="round" stroke-linejoin="round"
+              stroke-width="2.5"/>
       </svg>
     </button>
   </Transition>
