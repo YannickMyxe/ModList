@@ -6,8 +6,8 @@ import { ref } from "vue";
 
 const currentModList = ref<ModList | null>(null)
 
-const handleModListUploaded = (modList: ModList | null) => {
-  currentModList.value = modList;
+const handleModListUploaded = (modList: ModList[]) => {
+  currentModList.value = modList[0];
   console.table(modList);
 }
 </script>
