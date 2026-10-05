@@ -165,6 +165,30 @@ const downloadComparison = () => {
   URL.revokeObjectURL(downloadUrl);
 };
 
+const downloadFilteredComparison =  () => {
+  if (tableRows.value.length === 0) return;
+
+  const jsonString = JSON.stringify(
+    filteredRows.value.map(({data, average}) => ({
+      name: data.name,
+      url: data.url,
+      ratings: data.ratings,
+      average,
+    })),
+    null,
+    2
+  );
+  const blob = new Blob([jsonString], {type: "application/json"});
+  const downloadUrl = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = downloadUrl;
+  link.download = `modlist-rating-comparison-filtered-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(downloadUrl);
+};
+
 const tableHeads = ['Modname/Link', 'Ratings', 'Average'];
 </script>
 
@@ -267,6 +291,16 @@ const tableHeads = ['Modname/Link', 'Ratings', 'Average'];
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
       </svg>
       Download Comparison
+    </button>
+    <button
+      type="button"
+      @click="downloadFilteredComparison"
+      class="inline-flex items-center gap-2 px-4 py-2 bg-sky-800 hover:bg-sky-700 text-white text-sm font-medium rounded-lg shadow-xs transition-colors cursor-pointer"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+      </svg>
+      Download Filtered Comparison
     </button>
   </div>
 
