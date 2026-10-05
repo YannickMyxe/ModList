@@ -5,7 +5,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'click', event: MouseEvent),
+  (e: 'click', event: MouseEvent): void,
 }>();
 
 const onClick = (event: MouseEvent): void => {
