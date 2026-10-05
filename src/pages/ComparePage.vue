@@ -192,7 +192,12 @@ const downloadFilteredComparison = () => {
       <h2 class="text-xl font-semibold text-gray-800">Mod List</h2>
       <span
         class="px-2.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 rounded-full border border-gray-200">
-        {{ tableRows.length }} {{ tableRows.length === 1 ? 'mod' : 'mods' }}
+        <template v-if="filteredRows.length === tableRows.length">
+          {{ tableRows.length }} {{ tableRows.length === 1 ? 'mod' : 'mods' }}
+        </template>
+        <template v-else>
+          {{ filteredRows.length }} of {{ tableRows.length }} {{ tableRows.length === 1 ? 'mod' : 'mods' }}
+        </template>
       </span>
     </div>
   </div>
