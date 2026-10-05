@@ -5,6 +5,7 @@ import type {ModList} from "@/types/ModList.ts";
 import {computed, ref} from "vue";
 import YTable from "@/components/UI/YTable.vue";
 import TableFilter from "@/components/UI/TableFilter.vue";
+import YSelect from "@/components/UI/YSelect.vue";
 
 const modLists = ref<ModList[]>([]);
 
@@ -21,14 +22,23 @@ type TableRow = {
 
 const tableRows = ref<TableRow[]>([]);
 const searchQuery = ref("");
+const filterRating = ref<number>(-1);
 
 const filteredRows = computed(() => {
   const query = searchQuery.value.trim().toLowerCase();
-  if (!query) return tableRows.value;
 
-  return tableRows.value.filter(({data}) =>
-    data.name.toLowerCase().includes(query)
-  );
+  return tableRows.value.filter(({ data, average }) => {
+    const matchesName =
+      !query || data.name.toLowerCase().includes(query);
+
+    const matchesRating =
+      filterRating.value === -1 ||
+      (filterRating.value === 0
+        ? average === null
+        : average !== null && average >= filterRating.value);
+
+    return matchesName && matchesRating;
+  });
 });
 
 const calculateRating = (row: RatingRow) => {
@@ -101,10 +111,27 @@ const tableHeads = ['Modname/Link', 'Ratings', 'Average'];
     </div>
   </div>
 
-  <div class="mb-3">
-    <label for="mod-filter" class="mr-2">Filter on mod name:</label>
-    <TableFilter id="mod-filter" v-model="searchQuery" placeholder="Filter mods..." />
+  <div class="mb-3 flex flex-row flex-wrap gap-5">
+    <div>
+      <label for="mod-filter" class="mr-2">Filter on mod name:</label>
+      <TableFilter id="mod-filter" v-model="searchQuery" placeholder="Filter mods..." />
+    </div>
+    <div>
+      <label for="mod-rating" class="mr-2">Filter on mod rating:</label>
+      <YSelect id="mod-rating" v-model:option="filterRating" :options="[
+        {label: 'All', value: -1},
+        {label: 'Not Rated', value: 0},
+        {label: '1', value: 1},
+        {label: '2', value: 2},
+        {label: '3', value: 3},
+        {label: '4', value: 4},
+        {label: '5', value: 5},
+        ]"
+      />
+    </div>
   </div>
+
+
 
   <div class="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-xs mb-9">
     <y-table :head="tableHeads" class="">
