@@ -58,7 +58,7 @@ const strictnessOptions: ({ label: string; value: RatingStrictness })[] = [
 
 const tableHeads = ['Modname/Link', 'Ratings', 'Average'];
 
-const filteredRows = computed(() => {
+const filteredRows = computed<TableRow[]>(() => {
   const query = searchQuery.value.trim().toLowerCase();
 
   return tableRows.value.filter(({data, average}) => {
@@ -96,6 +96,12 @@ const calculateRating = (row: RatingRow) => {
     ? rated.reduce((sum, rating) => sum + rating, 0) / rated.length
     : null;
 }
+
+const formatAverage = (row: TableRow): string =>
+  row.average === null ? 'Not rated' : row.average.toFixed(1);
+
+const averageTextClass = (row: TableRow): string =>
+  row.average === null ? 'text-gray-400' : 'text-gray-900';
 
 const compareRatings = () => {
   tableRows.value = [];
@@ -230,12 +236,9 @@ const downloadFilteredComparison = () => {
           </span>
         </td>
         <td
-          :class="[
-            'px-6 py-4 font-medium whitespace-nowrap',
-            row.average === null ? 'text-gray-400' : 'text-gray-900',
-          ]"
+          :class="['px-6 py-4 font-medium whitespace-nowrap', averageTextClass(row)]"
         >
-          {{ row.average === null ? 'Not rated' : row.average.toFixed(1) }}
+          {{ formatAverage(row) }}
         </td>
       </tr>
       <tr v-if="tableRows.length === 0">

@@ -1,7 +1,4 @@
 <script setup lang="ts">
-
-import ModRating from "@/components/UI/ModRating.vue";
-
 const props = defineProps<{
   head: string[];
 }>();

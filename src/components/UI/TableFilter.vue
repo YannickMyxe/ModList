@@ -1,21 +1,14 @@
 <script setup lang="ts">
+const model = defineModel<string>({ required: true });
+
 const props = defineProps<{
-  modelValue: string;
   placeholder?: string;
 }>();
-const emit = defineEmits<{ "update:modelValue": [value: string] }>();
-
-const onInput = (event: Event): void => {
-  if (event.target instanceof HTMLInputElement) {
-    emit("update:modelValue", event.target.value);
-  }
-}
 </script>
 
 <template>
   <input
-    :value="props.modelValue"
-    @input="onInput"
+    v-model="model"
     type="search"
     :placeholder="props.placeholder ?? 'Filter...'"
     aria-label="Filter table"
