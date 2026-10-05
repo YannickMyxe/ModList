@@ -51,11 +51,19 @@ const onChange = async (details: FileUploadFileChangeDetails): Promise<void> => 
   try {
     const data: unknown = JSON.parse(await file.text())
     const items = getModListItems(data)
-    const validItems = items?.filter(isModListItem)
+    const validItems: ModListItem[] = []
 
-    if (!items || !validItems || validItems.length !== items.length) {
+    if (!items) {
       errorMessage.value = 'The JSON file does not contain a valid modlist.'
       return
+    }
+
+    for (const item of items) {
+      if (!isModListItem(item)) {
+        errorMessage.value = 'The JSON file does not contain a valid modlist.'
+        return
+      }
+      validItems.push(item)
     }
 
     emit('modListUploaded', { items: validItems })
