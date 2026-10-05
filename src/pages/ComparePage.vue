@@ -2,8 +2,9 @@
 import ModListUpload from "@/components/ModList/ModListUpload.vue";
 import YButton from "@/components/UI/YButton.vue";
 import type {ModList} from "@/types/ModList.ts";
-import {ref} from "vue";
+import {computed, ref} from "vue";
 import YTable from "@/components/UI/YTable.vue";
+import TableFilter from "@/components/UI/TableFilter.vue";
 
 const modLists = ref<ModList[]>([]);
 
@@ -19,6 +20,16 @@ type TableRow = {
 }
 
 const tableRows = ref<TableRow[]>([]);
+const searchQuery = ref("");
+
+const filteredRows = computed(() => {
+  const query = searchQuery.value.trim().toLowerCase();
+  if (!query) return tableRows.value;
+
+  return tableRows.value.filter(({data}) =>
+    data.name.toLowerCase().includes(query)
+  );
+});
 
 const calculateRating = (row: RatingRow) => {
   const rated = row.ratings.filter(rating => rating > 0);
@@ -90,10 +101,15 @@ const tableHeads = ['Modname/Link', 'Ratings', 'Average'];
     </div>
   </div>
 
+  <div class="mb-3">
+    <label for="mod-filter" class="mr-2">Filter on mod name:</label>
+    <TableFilter id="mod-filter" v-model="searchQuery" placeholder="Filter mods..." />
+  </div>
+
   <div class="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-xs mb-9">
     <y-table :head="tableHeads" class="">
       <tr
-        v-for="row in tableRows"
+        v-for="row in filteredRows"
         :key="row.data.url"
         class="hover:bg-gray-50/80 transition-colors"
       >
@@ -124,6 +140,11 @@ const tableHeads = ['Modname/Link', 'Ratings', 'Average'];
       <tr v-if="tableRows.length === 0">
         <td :colspan="tableHeads.length" class="px-6 py-8 text-center text-gray-400">
           No data
+        </td>
+      </tr>
+      <tr v-else-if="filteredRows.length === 0">
+        <td :colspan="tableHeads.length" class="px-6 py-8 text-center text-gray-400">
+          No matching mods
         </td>
       </tr>
     </y-table>
