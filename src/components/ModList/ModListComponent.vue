@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ModList } from "@/types/ModList.ts";
 import type { ModListItem } from "@/types/ModListItem.ts";
-import ModListTable from "@/components/ModListTable.vue";
+import ModListTable from "@/components/ModList/ModListTable.vue";
 import { computed, ref, onMounted, onUnmounted } from "vue";
 
 const props = defineProps<{

@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <h2>Compare 2 versions and see the differences</h2>
+  <h1 class="text-3xl">Compare 2 versions and see the differences</h1>
 </template>
 
 <style scoped>
