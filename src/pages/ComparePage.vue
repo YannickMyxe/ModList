@@ -179,7 +179,7 @@ const downloadFilteredComparison = () => {
 </script>
 
 <template>
-  <h1 class="text-3xl">Compare 2 versions and see the differences</h1>
+  <h1 class="text-3xl">Compare multiple ratings and see the differences</h1>
   <ModListUpload :max-files="null" @mod-list-uploaded="onUpload"/>
   <div class="flex justify-between">
     <YButton class="my-5" label="Compare ratings" @click="compareRatings"/>
