@@ -7,6 +7,8 @@ import YTable from "@/components/UI/YTable.vue";
 import TableFilter from "@/components/UI/TableFilter.vue";
 import YSelect from "@/components/UI/YSelect.vue";
 import {downloadJson} from "@/utils/downloadJson.ts";
+import type {ComparisonItem} from "@/types/ModListComparison.ts";
+import {createModListComparison} from "@/utils/modListComparison.ts";
 
 const modLists = ref<ModList[]>([]);
 
@@ -19,6 +21,15 @@ type RatingRow = {
 type TableRow = {
   data: RatingRow;
   average: number | null;
+}
+
+const tableRowToComparison = (table: TableRow): ComparisonItem => {
+  return {
+    name: table.data.name,
+    url: table.data.url,
+    ratings: table.data.ratings,
+    average: table.average,
+  }
 }
 
 type RatingStrictness = "lower" | "equal" | "higher";
@@ -143,13 +154,21 @@ onUnmounted(() => {
 const downloadComparison = () => {
   if (tableRows.value.length === 0) return;
 
-  downloadJson(tableRows.value, `modlist-rating-comparison-${new Date().toISOString().slice(0, 10)}.json`);
+  let items = createModListComparison(tableRows.value.map((row: TableRow) =>
+    tableRowToComparison(row)
+  ));
+
+  downloadJson(items, `modlist-rating-comparison-${new Date().toISOString().slice(0, 10)}.json`);
 };
 
 const downloadFilteredComparison = () => {
-  if (tableRows.value.length === 0) return;
+  if (filteredRows.value.length === 0) return;
 
-  downloadJson(filteredRows.value, `modlist-rating-comparison-filtered-${new Date().toISOString().slice(0, 10)}.json`);
+  let items = createModListComparison(filteredRows.value.map((row: TableRow) =>
+    tableRowToComparison(row)
+  ));
+
+  downloadJson(items, `modlist-rating-comparison-filtered-${new Date().toISOString().slice(0, 10)}.json`);
 };
 </script>
 
