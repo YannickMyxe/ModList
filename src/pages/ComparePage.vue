@@ -106,7 +106,12 @@ const tableHeads = ['Modname/Link', 'Ratings', 'Average'];
           <span class="truncate">{{ row.data.name }}</span>
           <span class="text-xs">↗</span>
         </a></td>
-        <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">ratings go here</td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <span v-for="(rating, index) in row.data.ratings" :key="index">
+            {{ rating > 0 ? rating.toFixed(1) : '—' }}
+            <span v-if="index < row.data.ratings.length - 1"> / </span>
+          </span>
+        </td>
         <td
           :class="[
             'px-6 py-4 font-medium whitespace-nowrap',
