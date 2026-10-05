@@ -11,6 +11,10 @@ const compareModLists = () => {
   }
 
   const [baseline, updated] = modLists.value;
+  if (!baseline || !updated) {
+    return;
+  }
+
   const baselineByUrl = new Map(baseline.items.map(item => [item.url, item]));
   const updatedByUrl = new Map(updated.items.map(item => [item.url, item]));
 
