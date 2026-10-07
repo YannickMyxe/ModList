@@ -27,6 +27,8 @@ const renderName = computed(() => {
   if (props.display === "short-url") {
     return shortenUrl();
   }
+
+  return props.label;
 });
 
 </script>

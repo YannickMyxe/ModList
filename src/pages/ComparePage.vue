@@ -146,7 +146,7 @@ const clearData = () => {
 const downloadComparison = () => {
   if (tableRows.value.length === 0) return;
 
-  let items = createModListComparison(tableRows.value.map((row: TableRow) =>
+  const items = createModListComparison(tableRows.value.map((row: TableRow) =>
     tableRowToComparison(row)
   ));
 
@@ -156,7 +156,7 @@ const downloadComparison = () => {
 const downloadFilteredComparison = () => {
   if (filteredRows.value.length === 0) return;
 
-  let items = createModListComparison(filteredRows.value.map((row: TableRow) =>
+  const items = createModListComparison(filteredRows.value.map((row: TableRow) =>
     tableRowToComparison(row)
   ));
 
@@ -239,7 +239,7 @@ const downloadFilteredComparison = () => {
 
   <div v-if="tableRows.length > 0" class="mb-8 flex justify-end gap-3">
     <BackToTopButton variant="inline" />
-    <download-button @click="downloadComparison"text="Download Comparison" />
+    <download-button @click="downloadComparison" text="Download Comparison" />
     <download-button @click="downloadFilteredComparison" text="Download Filtered Comparison" />
   </div>
 

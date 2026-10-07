@@ -28,7 +28,7 @@ const tableHead = [
       <tbody class="divide-y divide-gray-100">
         <tr
           v-for="mod in items"
-          :key="mod.label"
+          :key="mod.url"
           class="hover:bg-gray-50/80 transition-colors"
         >
           <!-- Mod Name -->

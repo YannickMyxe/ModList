@@ -10,8 +10,8 @@
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
     "lint": "run-s \"lint:*\"",
-    "lint:oxlint": "oxlint ModList --fix",
-    "lint:eslint": "eslint ModList --fix --cache",
+    "lint:oxlint": "oxlint src",
+    "lint:eslint": "eslint src",
     "format": "oxfmt src"
   },
   "dependencies": {

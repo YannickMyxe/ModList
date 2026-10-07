@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {createListCollection, Select} from '@ark-ui/vue/select'
 import { ChevronsUpDownIcon, XIcon, CheckIcon } from 'lucide-vue-next'
-import { ref } from 'vue'
+import { computed } from 'vue'
 
 type SelectItem = {
   label: string, value: string,
@@ -13,13 +13,23 @@ const props = defineProps<{
   placeholder: string;
 }>();
 
-const model = defineModel<string[]>({ default: [] });
+const model = defineModel<string[]>({ required: true });
 
-const collection = createListCollection({ items: props.items });
+const collection = computed(() => createListCollection({
+  items: props.items,
+  itemToValue: item => item.value,
+  itemToString: item => item.label,
+}));
 </script>
 
 <template>
-  <Select.Root :collection="collection" v-model="model" multiple class="flex w-full max-w-md flex-col gap-1.5">
+  <Select.Root
+    :collection="collection"
+    :model-value="model"
+    multiple
+    class="flex w-full max-w-md flex-col gap-1.5"
+    @update:model-value="model = $event"
+  >
     <Select.Label class="text-sm font-medium text-gray-700">{{ props.label }}</Select.Label>
     <Select.Control class="flex items-center gap-1.5">
       <Select.Trigger
