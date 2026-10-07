@@ -11,6 +11,7 @@ import {downloadJson} from "@/utils/downloadJson.ts";
 import type {ComparisonItem} from "@/types/ModListComparison.ts";
 import {createModListComparison} from "@/utils/modListComparison.ts";
 import DownloadButton from "@/components/UI/DownloadButton.vue";
+import ModUrl from "@/components/ModList/ModUrl.vue";
 
 const modLists = ref<ModList[]>([]);
 
@@ -210,15 +211,7 @@ const downloadFilteredComparison = () => {
         :key="row.data.url"
         class="hover:bg-gray-50/80 transition-colors"
       >
-        <td><a
-          :href="row.data.url"
-          class="px-5 inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 hover:underline transition-colors"
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          <span class="truncate">{{ row.data.name }}</span>
-          <span class="text-xs">↗</span>
-        </a></td>
+        <td><mod-url class="pl-5" :url="row.data.url" :label="row.data.name" /></td>
         <td class="px-6 py-4 whitespace-nowrap">
           <span v-for="(rating, index) in row.data.ratings" :key="index">
             {{ rating > 0 ? rating.toFixed(1) : '—' }}

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ModListItem } from "@/types/ModListItem.ts";
 import ModRating from "@/components/UI/ModRating.vue";
+import ModUrl from "@/components/ModList/ModUrl.vue";
 
 defineProps<{
   items: ModListItem[];
@@ -27,7 +28,7 @@ const tableHead = [
       <tbody class="divide-y divide-gray-100">
         <tr
           v-for="mod in items"
-          :key="mod.name"
+          :key="mod.label"
           class="hover:bg-gray-50/80 transition-colors"
         >
           <!-- Mod Name -->
@@ -44,17 +45,7 @@ const tableHead = [
 
           <!-- Link -->
           <td class="px-6 py-4 max-w-sm truncate">
-            <a
-              v-if="mod.url"
-              :href="mod.url"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 hover:underline transition-colors"
-            >
-              <span class="truncate">{{ mod.url.replace(/^https?:\/\//, '') }}</span>
-              <span class="text-xs">↗</span>
-            </a>
-            <span v-else class="text-gray-400 italic">No URL</span>
+            <mod-url :url="mod.url" :label="mod.url" display="short-url" />
           </td>
 
           <!-- Rating -->

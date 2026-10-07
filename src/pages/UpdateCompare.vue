@@ -6,6 +6,7 @@ import ModListUpload from "@/components/ModList/ModListUpload.vue";
 import YTable from "@/components/UI/YTable.vue";
 import BackToTopButton from "@/components/UI/BackToTopButton.vue";
 import DownloadButton from "@/components/UI/DownloadButton.vue";
+import ModUrl from "@/components/ModList/ModUrl.vue";
 
 type UpdatedMod = {
   previous: ModListItem;
@@ -173,15 +174,9 @@ const modRows = computed<ModRow[]>(() => {
         <td class="w-full text-center text-lg py-5" :colspan="tableHeaders.length">No mods found.</td>
       </tr>
       <tr v-for="row in modRows" class="hover:bg-gray-50/80 transition-colors" :key="row.url">
-        <td class="px-6 py-4 whitespace-nowrap"><a
-          :href="row.url"
-          class="px-5 inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 hover:underline transition-colors"
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          <span class="truncate">{{ row.name }}</span>
-          <span class="text-xs">↗</span>
-        </a></td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <mod-url :url="row.url" :label="row.name" />
+        </td>
         <td class="px-6 py-4 whitespace-nowrap">{{row.oldVersion?? "-"}}</td>
         <td class="px-6 py-4 whitespace-nowrap">{{row.newVersion?? "-"}}</td>
         <td class="px-6 py-4 whitespace-nowrap">{{row.status}}</td>
