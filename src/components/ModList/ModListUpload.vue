@@ -1,16 +1,18 @@
-<script setup lang="ts">
-import { ref } from 'vue'
+<script lang="ts" setup>
+import {ref} from 'vue'
 import FileUpload from '@/components/UI/FileUpload.vue'
-import type { ModList } from '@/types/ModList'
-import type { ModListItem } from '@/types/ModListItem'
-import type { FileUploadFileChangeDetails } from '@ark-ui/vue/file-upload'
+import type {ModList} from '@/types/ModList'
+import type {ModListItem} from '@/types/ModListItem'
+import type {FileUploadFileChangeDetails} from '@ark-ui/vue/file-upload'
 
 const props = defineProps<{
+  text?: string;
+  dropzoneText?: string;
   maxFiles?: number | null;
 }>();
 
 const emit = defineEmits<{
-  (e: 'modListUploaded', lists: ModList[]): void
+  (e: 'modListUploaded', lists: ModList[], fileNames: string[]): void
 }>()
 
 const errorMessage = ref<string | null>(null)
@@ -44,8 +46,8 @@ const onChange = async (details: FileUploadFileChangeDetails): Promise<void> => 
   }
 
   try {
-    const lists = await Promise.all(
-      details.acceptedFiles.map(async (file): Promise<ModList> => {
+    const uploadedLists = await Promise.all(
+      details.acceptedFiles.map(async (file): Promise<{ list: ModList; fileName: string }> => {
         const data: unknown = JSON.parse(await file.text())
         const items = getModListItems(data)
 
@@ -61,11 +63,18 @@ const onChange = async (details: FileUploadFileChangeDetails): Promise<void> => 
           validItems.push(item);
         }
 
-        return { items: validItems }
+        return {
+          list: {items: validItems},
+          fileName: file.name,
+        }
       }),
     )
 
-    emit('modListUploaded', lists)
+    emit(
+      'modListUploaded',
+      uploadedLists.map(upload => upload.list),
+      uploadedLists.map(upload => upload.fileName),
+    )
   } catch (error) {
     errorMessage.value = error instanceof SyntaxError
       ? 'A selected file is not valid JSON.'
@@ -77,15 +86,15 @@ const onChange = async (details: FileUploadFileChangeDetails): Promise<void> => 
 </script>
 
 <template>
-  <div>
+  <div class="w-full">
     <FileUpload
-      accept="application/json,.json"
+      :dropzone-text="props.dropzoneText?? 'Drag and drop a JSON file here'"
+      :label="props.text?? 'Upload modlist file'"
       :max-files="props.maxFiles"
-      label="Upload modlist file"
-      dropzone-text="Drag and drop a JSON file here"
+      accept="application/json,.json"
       @file-change="onChange"
     />
-    <p v-if="errorMessage" role="alert" class="mt-2 text-sm text-red-700">
+    <p v-if="errorMessage" class="mt-2 text-sm text-red-700" role="alert">
       {{ errorMessage }}
     </p>
   </div>

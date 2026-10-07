@@ -1,7 +1,4 @@
-import type {
-  ComparisonItem,
-  ModListComparisonFile,
-} from "@/types/ModListComparison";
+import type {ComparisonItem, ModListComparisonFile,} from "@/types/ModListComparison";
 
 export function createModListComparison(
   items: ComparisonItem[],

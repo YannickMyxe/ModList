@@ -1,10 +1,10 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 const props = defineProps<{
   options: Array<{ label: string; value: string | number }>;
   id?: string;
 }>();
 
-const model = defineModel<string | number>("option", { required: true });
+const model = defineModel<string | number>("option", {required: true});
 </script>
 
 <template>

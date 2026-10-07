@@ -1,5 +1,14 @@
-<script setup lang="ts">
-import { FileUpload as ArkFileUpload, type FileUploadFileChangeDetails } from '@ark-ui/vue/file-upload'
+<script lang="ts" setup>
+import {computed} from 'vue'
+import {
+  FileUploadContext,
+  FileUploadDropzone,
+  type FileUploadFileChangeDetails,
+  FileUploadHiddenInput,
+  FileUploadItemGroup,
+  FileUploadLabel,
+  FileUploadRoot,
+} from '@ark-ui/vue/file-upload'
 import FileUploadItem from './FileUploadItem.vue'
 
 const props = defineProps<{
@@ -8,6 +17,9 @@ const props = defineProps<{
   dropzoneText: string;
   maxFiles?: number | null;
 }>()
+
+const dropzoneText = computed(() => props.dropzoneText)
+const maxFiles = computed<number>(() => props.maxFiles ?? Number.POSITIVE_INFINITY)
 
 const emit = defineEmits<{
   (e: 'file-change', details: FileUploadFileChangeDetails): void
@@ -20,40 +32,41 @@ const onFileChange = (details: FileUploadFileChangeDetails): void => {
 </script>
 
 <template>
-  <ArkFileUpload.Root
-    :maxFiles="props.maxFiles === null ? Number.POSITIVE_INFINITY : props.maxFiles"
+  <FileUploadRoot
     :accept="props.accept"
+    :max-files="maxFiles"
     @file-change="onFileChange"
   >
-    <ArkFileUpload.Label class="font-bold">{{ props.label }}</ArkFileUpload.Label>
-    <ArkFileUpload.Dropzone class="min-w-max p-3 mt-1 mb-3 border border-gray-300 rounded-lg text-center text-xl">
-      <div>{{ props.dropzoneText }}</div>
+    <FileUploadLabel class="font-bold">{{ props.label }}</FileUploadLabel>
+    <FileUploadDropzone
+      class="min-w-max p-3 mt-1 mb-3 border border-gray-300 rounded-lg text-center text-xl">
+      <div>{{ dropzoneText }}</div>
       <div>or click to browse</div>
-    </ArkFileUpload.Dropzone>
+    </FileUploadDropzone>
 
-    <ArkFileUpload.ItemGroup>
-      <ArkFileUpload.Context v-slot="{ acceptedFiles }">
+    <FileUploadItemGroup>
+      <FileUploadContext v-slot="{ acceptedFiles }">
         <FileUploadItem
           v-for="file in acceptedFiles"
           :key="file.name"
           :file="file"
           type="accepted"
         />
-      </ArkFileUpload.Context>
-    </ArkFileUpload.ItemGroup>
+      </FileUploadContext>
+    </FileUploadItemGroup>
 
-    <ArkFileUpload.ItemGroup type="rejected">
-      <ArkFileUpload.Context v-slot="{ rejectedFiles }">
+    <FileUploadItemGroup type="rejected">
+      <FileUploadContext v-slot="{ rejectedFiles }">
         <FileUploadItem
           v-for="rejection in rejectedFiles"
           :key="`${rejection.file.name}-${rejection.errors.join('-')}`"
-          :file="rejection.file"
           :errors="rejection.errors"
+          :file="rejection.file"
           type="rejected"
         />
-      </ArkFileUpload.Context>
-    </ArkFileUpload.ItemGroup>
+      </FileUploadContext>
+    </FileUploadItemGroup>
 
-    <ArkFileUpload.HiddenInput />
-  </ArkFileUpload.Root>
+    <FileUploadHiddenInput/>
+  </FileUploadRoot>
 </template>
