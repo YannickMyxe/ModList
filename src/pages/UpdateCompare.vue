@@ -182,8 +182,8 @@ const modRows = computed<ModRow[]>(() => {
       <tr v-if="amountOfChanges === 0" >
         <td class="w-full text-center text-lg py-5" :colspan="tableHeaders.length">No changes found.</td>
       </tr>
-      <tr v-else v-for="row in modRows">
-        <td><a
+      <tr v-else v-for="row in modRows" class="hover:bg-gray-50/80 transition-colors" :key="row.url">
+        <td class="px-6 py-4 whitespace-nowrap"><a
           :href="row.url"
           class="px-5 inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 hover:underline transition-colors"
           rel="noopener noreferrer"
@@ -192,9 +192,9 @@ const modRows = computed<ModRow[]>(() => {
           <span class="truncate">{{ row.name }}</span>
           <span class="text-xs">↗</span>
         </a></td>
-        <td>{{row.oldVersion?? "-"}}</td>
-        <td>{{row.newVersion?? "-"}}</td>
-        <td>{{row.status}}</td>
+        <td class="px-6 py-4 whitespace-nowrap">{{row.oldVersion?? "-"}}</td>
+        <td class="px-6 py-4 whitespace-nowrap">{{row.newVersion?? "-"}}</td>
+        <td class="px-6 py-4 whitespace-nowrap">{{row.status}}</td>
       </tr>
     </y-table>
     </div>
