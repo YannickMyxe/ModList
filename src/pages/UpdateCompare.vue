@@ -1,50 +1,140 @@
 <script setup lang="ts">
-import {ref} from "vue";
+import {computed, ref} from "vue";
 import type {ModList} from "@/types/ModList.ts";
+import type {ModListItem} from "@/types/ModListItem.ts";
 import ModListUpload from "@/components/ModList/ModListUpload.vue";
-import YButton from "@/components/UI/YButton.vue";
 import YTable from "@/components/UI/YTable.vue";
 
-const modLists = ref<ModList[]>([]);
-
-const compareModLists = () => {
-  if (modLists.value.length !== 2) {
-    console.warn("Not enough mod lists");
-    return;
-  }
-
-  const [baseline, updated] = modLists.value;
-  if (!baseline || !updated) {
-    return;
-  }
-
-  const baselineByUrl = new Map(baseline.items.map(item => [item.url, item]));
-  const updatedByUrl = new Map(updated.items.map(item => [item.url, item]));
-
-  const added = updated.items.filter(item => !baselineByUrl.has(item.url));
-  const removed = baseline.items.filter(item => !updatedByUrl.has(item.url));
-  const changed = updated.items.flatMap(item => {
-    const previous = baselineByUrl.get(item.url);
-    if (!previous) return [];
-
-    const versionChanged = previous.version !== item.version;
-    const ratingChanged = previous.rating !== item.rating;
-    return versionChanged || ratingChanged
-      ? [{ previous, current: item, versionChanged, ratingChanged }]
-      : [];
-  });
-  console.table(added);
-  console.table(removed);
-  console.table(changed);
-
-  // Store these in a result ref and render the three groups in the template.
+type UpdatedMod = {
+  previous: ModListItem;
+  current: ModListItem;
 };
 
-const tableHeaders = [
-  "Name",
-  "Version",
-  "Url",
-];
+type ModListChanges = {
+  added: ModListItem[];
+  removed: ModListItem[];
+  updated: UpdatedMod[];
+};
+
+type ModStatus = "Added" | "Removed" | "Updated" | "No changes";
+
+type ModRow = {
+  url: string;
+  name: string;
+  oldVersion: string | null;
+  newVersion: string | null;
+  status: ModStatus;
+};
+
+const oldModList = ref<ModList | null>(null);
+const newModList = ref<ModList | null>(null);
+
+const changes = computed<ModListChanges | null>(() => {
+  if (!oldModList.value || !newModList.value) return null;
+
+  const oldByUrl: Map<string, ModListItem> = new Map(oldModList.value.items.map(item => [item.url, item]));
+  const newByUrl: Map<string, ModListItem> = new Map(newModList.value.items.map(item => [item.url, item]));
+
+  return {
+    added: newModList.value.items.filter(item => !oldByUrl.has(item.url)),
+    removed: oldModList.value.items.filter(item => !newByUrl.has(item.url)),
+    updated: newModList.value.items.flatMap(item => {
+      const previous = oldByUrl.get(item.url);
+      return previous && previous.version !== item.version
+        ? [{previous, current: item}]
+        : [];
+    }),
+  };
+});
+
+const markdownEscape = (value: string): string =>
+  value.replace(/[\\`*_{}[\]()#+.!|>~-]/g, "\\$&");
+
+const modLink = (item: ModListItem): string =>
+  `[${markdownEscape(item.name)}](${item.url.replace(/[()\\\s]/g, "\\$&")})`;
+
+const changelog = computed(() => {
+  const result = changes.value;
+  if (!result) return "";
+
+  const sections = [
+    ["Added", result.added.map(item => `- ${modLink(item)} (v${markdownEscape(item.version)})`)],
+    ["Updated", result.updated.map(({previous, current}) =>
+      `- ${modLink(current)}: v${markdownEscape(previous.version)} → v${markdownEscape(current.version)}`)],
+    ["Removed", result.removed.map(item => `- ${modLink(item)} (v${markdownEscape(item.version)})`)],
+  ] as const;
+
+  return [
+    "# Mod list changes",
+    "",
+    ...sections.flatMap(([title, items]) => [
+      `## ${title} (${items.length})`,
+      "",
+      ...(items.length > 0 ? items : ["- None"]),
+      "",
+    ]),
+  ].join("\n").trimEnd() + "\n";
+});
+
+const downloadChangelog = (): void => {
+  if (!changes.value) return;
+
+  const blob = new Blob([changelog.value], {type: "text/markdown;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = `modlist-changelog-${new Date().toISOString().slice(0, 10)}.md`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+};
+
+const tableHeaders = ["Mod", "Old-Version", "New Version", "Status"];
+
+const onOldModListUploaded = (lists: ModList[]): void => {
+  oldModList.value = lists[0] ?? null;
+};
+
+const onNewModListUploaded = (lists: ModList[]): void => {
+  newModList.value = lists[0] ?? null;
+};
+
+const amountOfChanges = computed(() => {
+  const result = changes.value;
+  if (!result) return 0;
+
+  return result.added.length + result.removed.length + result.updated.length;
+})
+
+const modRows = computed<ModRow[]>(() => {
+  if (!oldModList.value || !newModList.value) return [];
+  const oldByUrl: Map<string, ModListItem> = new Map(oldModList.value.items.map(item => [item.url, item]));
+  const newByUrl: Map<string, ModListItem> = new Map(newModList.value.items.map(item => [item.url, item]));
+  const urls = new Set([...oldByUrl.keys(), ...newByUrl.keys()]);
+
+  return [...urls]
+    .map(url => {
+      const oldItem = oldByUrl.get(url);
+      const newItem = newByUrl.get(url);
+
+      let status: ModStatus;
+      if (!oldItem) status = "Added";
+      else if (!newItem) status = "Removed";
+      else if (oldItem.version !== newItem.version) status = "Updated";
+      else status = "No changes";
+
+      return {
+        url,
+        name: newItem?.name ?? oldItem!.name,
+        oldVersion: oldItem?.version ?? null,
+        newVersion: newItem?.version ?? null,
+        status,
+      } as ModRow
+    })
+    .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }))
+});
 </script>
 
 <template>
@@ -53,17 +143,60 @@ const tableHeaders = [
   <p>Use the changelog generator to generate a MD template which you can use as your changelog.</p>
 
   <div class="flex w-full flex-col gap-3 md:flex-row">
-    <mod-list-upload class="mt-5" :max-files="1" label="Upload the old modlist" dropzone-text="Upload Old modlist" />
-    <mod-list-upload class="mt-5" :max-files="1" label="Upload the new modlist" dropzone-text="Upload New modlist" />
+    <ModListUpload
+      class="mt-5 min-w-0 flex-1"
+      :max-files="1"
+      label="Upload the old modlist"
+      dropzone-text="Upload Old modlist"
+      @mod-list-uploaded="onOldModListUploaded"
+    />
+    <ModListUpload
+      class="mt-5 min-w-0 flex-1"
+      :max-files="1"
+      label="Upload the new modlist"
+      dropzone-text="Upload New modlist"
+      @mod-list-uploaded="onNewModListUploaded"
+    />
   </div>
 
-  <y-table :head="tableHeaders" class="my-5" >
+  <section v-if="changes" class="mt-8 space-y-8">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <h3 class="text-2xl font-semibold">Changes between modlists</h3>
+      <button
+        @click="downloadChangelog"
+        :disabled="amountOfChanges === 0"
+        class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 cursor-pointer
+         disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 disabled:hover:bg-gray-400"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+             xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-linecap="round" stroke-linejoin="round"
+                stroke-width="2"/>
+        </svg>
+        Download Markdown changelog
+      </button>
+    </div>
 
-  </y-table>
-
-  <y-button label="Generate changelog"/>
+    <div class="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-xs mb-9">
+    <y-table :head="tableHeaders">
+      <tr v-if="amountOfChanges === 0" >
+        <td class="w-full text-center text-lg py-5" :colspan="tableHeaders.length">No changes found.</td>
+      </tr>
+      <tr v-else v-for="row in modRows">
+        <td><a
+          :href="row.url"
+          class="px-5 inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          <span class="truncate">{{ row.name }}</span>
+          <span class="text-xs">↗</span>
+        </a></td>
+        <td>{{row.oldVersion?? "-"}}</td>
+        <td>{{row.newVersion?? "-"}}</td>
+        <td>{{row.status}}</td>
+      </tr>
+    </y-table>
+    </div>
+  </section>
 </template>
-
-<style scoped>
-
-</style>
