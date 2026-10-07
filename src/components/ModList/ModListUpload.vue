@@ -6,6 +6,8 @@ import type { ModListItem } from '@/types/ModListItem'
 import type { FileUploadFileChangeDetails } from '@ark-ui/vue/file-upload'
 
 const props = defineProps<{
+  label?: string;
+  dropzoneText?: string;
   maxFiles?: number | null;
 }>();
 
@@ -81,8 +83,8 @@ const onChange = async (details: FileUploadFileChangeDetails): Promise<void> => 
     <FileUpload
       accept="application/json,.json"
       :max-files="props.maxFiles"
-      label="Upload modlist file"
-      dropzone-text="Drag and drop a JSON file here"
+      :label="props.label?? 'Upload modlist file'"
+      :dropzone-text="props.dropzoneText?? 'Drag and drop a JSON file here'"
       @file-change="onChange"
     />
     <p v-if="errorMessage" role="alert" class="mt-2 text-sm text-red-700">

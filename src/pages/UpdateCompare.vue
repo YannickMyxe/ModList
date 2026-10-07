@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {ref} from "vue";
 import type {ModList} from "@/types/ModList.ts";
+import ModListUpload from "@/components/ModList/ModListUpload.vue";
 
 const modLists = ref<ModList[]>([]);
 
@@ -42,6 +43,8 @@ const compareModLists = () => {
   <h2 class="text-3xl">Compare 2 versions of modlist</h2>
   <p>Here you can compare 2 versions of a modlist and see what changed. See what is removed, added, updated.</p>
   <p>Use the changelog generator to generate a MD template which you can use as your changelog.</p>
+
+  <mod-list-upload class="mt-5" :max-files="2" label="Upload the old modlist and the new modlist" dropzone-text="Upload modlists" />
 </template>
 
 <style scoped>
