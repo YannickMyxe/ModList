@@ -165,15 +165,18 @@ const modRows = computed<ModRow[]>(() => {
   <section v-if="changes" class="mt-8 space-y-8">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <h3 class="text-2xl font-semibold">Changes between modlists</h3>
-      <DownloadButton text="Download Markdown Changelog" @click="downloadChangelog" />
+      <DownloadButton :disabled="amountOfChanges === 0" text="Download Markdown Changelog" @click="downloadChangelog" />
     </div>
 
     <div class="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-xs mb-9">
     <y-table :head="tableHeaders">
       <tr v-if="modRows.length === 0">
-        <td class="w-full text-center text-lg py-5" :colspan="tableHeaders.length">No mods found.</td>
+        <td :colspan="tableHeaders.length">No mods found.</td>
       </tr>
-      <tr v-for="row in modRows" class="hover:bg-gray-50/80 transition-colors" :key="row.url">
+      <tr v-else-if="amountOfChanges === 0">
+        <td class="w-full text-center text-lg py-5" :colspan="tableHeaders.length">No changes found.</td>
+      </tr>
+      <tr v-else v-for="row in modRows" class="hover:bg-gray-50/80 transition-colors" :key="row.url">
         <td class="px-6 py-4 whitespace-nowrap">
           <mod-url :url="row.url" :label="row.name" />
         </td>
