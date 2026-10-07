@@ -7,6 +7,7 @@ import YTable from "@/components/UI/YTable.vue";
 import BackToTopButton from "@/components/UI/BackToTopButton.vue";
 import DownloadButton from "@/components/UI/DownloadButton.vue";
 import ModUrl from "@/components/ModList/ModUrl.vue";
+import YMultiSelect from "@/components/UI/YMultiSelect.vue";
 
 type UpdatedMod = {
   previous: ModListItem;
@@ -28,6 +29,13 @@ type ModRow = {
   newVersion: string | null;
   status: ModStatus;
 };
+
+const statusOptions: { label: string, value: string, }[] = [
+  { label: "Added", value: "Added" },
+  { label: "Removed", value: "Removed" },
+  { label: "Updated", value: "Updated" },
+  { label: "No changes", value: "No changes" },
+];
 
 const oldModList = ref<ModList | null>(null);
 const newModList = ref<ModList | null>(null);
@@ -138,6 +146,15 @@ const modRows = computed<ModRow[]>(() => {
     })
     .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }))
 });
+
+const selectedStatuses = ref<string[]>([]);
+const filteredRows = computed(() => {
+  if (selectedStatuses.value.length === 0) return modRows.value;
+
+  return modRows.value.filter(row =>
+    selectedStatuses.value.includes(row.status)
+  );
+});
 </script>
 
 <template>
@@ -162,21 +179,29 @@ const modRows = computed<ModRow[]>(() => {
     />
   </div>
 
-  <section v-if="changes" class="mt-8 space-y-8">
+  <section v-if="changes" class="mt-4 space-y-8">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <h3 class="text-2xl font-semibold">Changes between modlists</h3>
       <DownloadButton :disabled="amountOfChanges === 0" text="Download Markdown Changelog" @click="downloadChangelog" />
     </div>
+    <div class="flex flex-col gap-3">
+      <label for="summary">Add an optional changelog summary above the list of changes. You can use Markdown. After downloading the file you can still change anything you want.</label>
+      <textarea class="p-3 rounded-md border border-b-gray-400" name="summary" id="summary" cols="30" rows="10" placeholder="Insert changelog summary here ..."></textarea>
+    </div>
+
+    <div>
+      <YMultiSelect :items="statusOptions" label="Select status to show" placeholder="All statuses" v-model="selectedStatuses" ></YMultiSelect>
+    </div>
 
     <div class="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-xs mb-9">
     <y-table :head="tableHeaders">
-      <tr v-if="modRows.length === 0">
-        <td :colspan="tableHeaders.length">No mods found.</td>
+      <tr v-if="filteredRows.length === 0">
+        <td class="w-full text-center text-lg py-5" :colspan="tableHeaders.length">No mods found.</td>
       </tr>
       <tr v-else-if="amountOfChanges === 0">
         <td class="w-full text-center text-lg py-5" :colspan="tableHeaders.length">No changes found.</td>
       </tr>
-      <tr v-else v-for="row in modRows" class="hover:bg-gray-50/80 transition-colors" :key="row.url">
+      <tr v-else v-for="row in filteredRows" class="hover:bg-gray-50/80 transition-colors" :key="row.url">
         <td class="px-6 py-4 whitespace-nowrap">
           <mod-url :url="row.url" :label="row.name" />
         </td>
