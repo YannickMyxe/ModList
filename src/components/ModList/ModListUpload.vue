@@ -12,7 +12,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'modListUploaded', lists: ModList[]): void
+  (e: 'modListUploaded', lists: ModList[], fileNames: string[]): void
 }>()
 
 const errorMessage = ref<string | null>(null)
@@ -46,8 +46,8 @@ const onChange = async (details: FileUploadFileChangeDetails): Promise<void> => 
   }
 
   try {
-    const lists = await Promise.all(
-      details.acceptedFiles.map(async (file): Promise<ModList> => {
+    const uploadedLists = await Promise.all(
+      details.acceptedFiles.map(async (file): Promise<{ list: ModList; fileName: string }> => {
         const data: unknown = JSON.parse(await file.text())
         const items = getModListItems(data)
 
@@ -63,11 +63,18 @@ const onChange = async (details: FileUploadFileChangeDetails): Promise<void> => 
           validItems.push(item);
         }
 
-        return { items: validItems }
+        return {
+          list: {items: validItems},
+          fileName: file.name,
+        }
       }),
     )
 
-    emit('modListUploaded', lists)
+    emit(
+      'modListUploaded',
+      uploadedLists.map(upload => upload.list),
+      uploadedLists.map(upload => upload.fileName),
+    )
   } catch (error) {
     errorMessage.value = error instanceof SyntaxError
       ? 'A selected file is not valid JSON.'

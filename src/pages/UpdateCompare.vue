@@ -123,8 +123,12 @@ const onOldModListUploaded = (lists: ModList[]): void => {
   oldModList.value = lists[0] ?? null;
 };
 
-const onNewModListUploaded = (lists: ModList[]): void => {
+const onNewModListUploaded = (lists: ModList[], fileNames: string[]): void => {
   newModList.value = lists[0] ?? null;
+  const fileName = fileNames[0];
+  if (fileName) {
+    modpackTitle.value = fileName.replace(/\.json$/i, "");
+  }
 };
 
 const amountOfChanges = computed(() => {
