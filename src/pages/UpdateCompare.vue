@@ -2,6 +2,8 @@
 import {ref} from "vue";
 import type {ModList} from "@/types/ModList.ts";
 import ModListUpload from "@/components/ModList/ModListUpload.vue";
+import YButton from "@/components/UI/YButton.vue";
+import YTable from "@/components/UI/YTable.vue";
 
 const modLists = ref<ModList[]>([]);
 
@@ -37,6 +39,12 @@ const compareModLists = () => {
 
   // Store these in a result ref and render the three groups in the template.
 };
+
+const tableHeaders = [
+  "Name",
+  "Version",
+  "Url",
+];
 </script>
 
 <template>
@@ -44,7 +52,16 @@ const compareModLists = () => {
   <p>Here you can compare 2 versions of a modlist and see what changed. See what is removed, added, updated.</p>
   <p>Use the changelog generator to generate a MD template which you can use as your changelog.</p>
 
-  <mod-list-upload class="mt-5" :max-files="2" label="Upload the old modlist and the new modlist" dropzone-text="Upload modlists" />
+  <div class="flex w-full flex-col gap-3 md:flex-row">
+    <mod-list-upload class="mt-5" :max-files="1" label="Upload the old modlist" dropzone-text="Upload Old modlist" />
+    <mod-list-upload class="mt-5" :max-files="1" label="Upload the new modlist" dropzone-text="Upload New modlist" />
+  </div>
+
+  <y-table :head="tableHeaders" class="my-5" >
+
+  </y-table>
+
+  <y-button label="Generate changelog"/>
 </template>
 
 <style scoped>

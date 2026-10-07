@@ -79,7 +79,7 @@ const onChange = async (details: FileUploadFileChangeDetails): Promise<void> => 
 </script>
 
 <template>
-  <div>
+  <div class="w-full">
     <FileUpload
       accept="application/json,.json"
       :max-files="props.maxFiles"
