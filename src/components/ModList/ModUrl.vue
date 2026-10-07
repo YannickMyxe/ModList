@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import {computed} from "vue";
 
 type DisplayOptions = "name" | "short-url" | "full-url";

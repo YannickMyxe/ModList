@@ -1,5 +1,5 @@
-<script setup lang="ts">
-import type { ModListItem } from "@/types/ModListItem.ts";
+<script lang="ts" setup>
+import type {ModListItem} from "@/types/ModListItem.ts";
 import ModRating from "@/components/UI/ModRating.vue";
 import ModUrl from "@/components/ModList/ModUrl.vue";
 
@@ -16,50 +16,52 @@ const tableHead = [
   <div class="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-xs">
     <table class="w-full text-left text-sm text-gray-600 border-collapse">
       <!-- Header -->
-      <thead class="bg-gray-50/75 border-b border-gray-200 text-xs font-semibold uppercase tracking-wider text-gray-500">
-        <tr>
-          <th v-for="table in tableHead" :key="table" scope="col" class="px-6 py-3.5">
-            {{ table }}
-          </th>
-        </tr>
+      <thead
+        class="bg-gray-50/75 border-b border-gray-200 text-xs font-semibold uppercase tracking-wider text-gray-500">
+      <tr>
+        <th v-for="table in tableHead" :key="table" class="px-6 py-3.5" scope="col">
+          {{ table }}
+        </th>
+      </tr>
       </thead>
 
       <!-- Body -->
       <tbody class="divide-y divide-gray-100">
-        <tr
-          v-for="mod in items"
-          :key="mod.url"
-          class="hover:bg-gray-50/80 transition-colors"
-        >
-          <!-- Mod Name -->
-          <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-            {{ mod.name }}
-          </td>
+      <tr
+        v-for="mod in items"
+        :key="mod.url"
+        class="hover:bg-gray-50/80 transition-colors"
+      >
+        <!-- Mod Name -->
+        <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+          {{ mod.name }}
+        </td>
 
-          <!-- Version Badge -->
-          <td class="px-6 py-4 whitespace-nowrap">
-            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-mono font-medium bg-blue-50 text-blue-700 border border-blue-200/60">
+        <!-- Version Badge -->
+        <td class="px-6 py-4 whitespace-nowrap">
+            <span
+              class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-mono font-medium bg-blue-50 text-blue-700 border border-blue-200/60">
               {{ mod.version }}
             </span>
-          </td>
+        </td>
 
-          <!-- Link -->
-          <td class="px-6 py-4 max-w-sm truncate">
-            <mod-url :url="mod.url" :label="mod.url" display="short-url" />
-          </td>
+        <!-- Link -->
+        <td class="px-6 py-4 max-w-sm truncate">
+          <mod-url :label="mod.url" :url="mod.url" display="short-url"/>
+        </td>
 
-          <!-- Rating -->
-          <td class="px-6 py-4 whitespace-nowrap">
-            <ModRating v-model="mod.rating" />
-          </td>
-        </tr>
+        <!-- Rating -->
+        <td class="px-6 py-4 whitespace-nowrap">
+          <ModRating v-model="mod.rating"/>
+        </td>
+      </tr>
 
-        <!-- Empty State -->
-        <tr v-if="items.length === 0">
-          <td colspan="4" class="px-6 py-10 text-center text-gray-400">
-            No mods found in the uploaded file.
-          </td>
-        </tr>
+      <!-- Empty State -->
+      <tr v-if="items.length === 0">
+        <td class="px-6 py-10 text-center text-gray-400" colspan="4">
+          No mods found in the uploaded file.
+        </td>
+      </tr>
       </tbody>
     </table>
   </div>

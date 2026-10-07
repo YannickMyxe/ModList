@@ -1,9 +1,9 @@
-<script setup lang="ts">
-import { ref } from 'vue'
+<script lang="ts" setup>
+import {ref} from 'vue'
 import FileUpload from '@/components/UI/FileUpload.vue'
-import type { ModList } from '@/types/ModList'
-import type { ModListItem } from '@/types/ModListItem'
-import type { FileUploadFileChangeDetails } from '@ark-ui/vue/file-upload'
+import type {ModList} from '@/types/ModList'
+import type {ModListItem} from '@/types/ModListItem'
+import type {FileUploadFileChangeDetails} from '@ark-ui/vue/file-upload'
 
 const props = defineProps<{
   text?: string;
@@ -88,13 +88,13 @@ const onChange = async (details: FileUploadFileChangeDetails): Promise<void> => 
 <template>
   <div class="w-full">
     <FileUpload
-      accept="application/json,.json"
-      :max-files="props.maxFiles"
-      :label="props.text?? 'Upload modlist file'"
       :dropzone-text="props.dropzoneText?? 'Drag and drop a JSON file here'"
+      :label="props.text?? 'Upload modlist file'"
+      :max-files="props.maxFiles"
+      accept="application/json,.json"
       @file-change="onChange"
     />
-    <p v-if="errorMessage" role="alert" class="mt-2 text-sm text-red-700">
+    <p v-if="errorMessage" class="mt-2 text-sm text-red-700" role="alert">
       {{ errorMessage }}
     </p>
   </div>

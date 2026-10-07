@@ -182,7 +182,9 @@ const downloadFilteredComparison = () => {
           {{ tableRows.length }} {{ tableRows.length === 1 ? 'mod' : 'mods' }}
         </template>
         <template v-else>
-          {{ filteredRows.length }} of {{ tableRows.length }} {{ tableRows.length === 1 ? 'mod' : 'mods' }}
+          {{ filteredRows.length }} of {{
+            tableRows.length
+          }} {{ tableRows.length === 1 ? 'mod' : 'mods' }}
         </template>
       </span>
     </div>
@@ -211,7 +213,9 @@ const downloadFilteredComparison = () => {
         :key="row.data.url"
         class="hover:bg-gray-50/80 transition-colors"
       >
-        <td><mod-url class="pl-5" :url="row.data.url" :label="row.data.name" /></td>
+        <td>
+          <mod-url :label="row.data.name" :url="row.data.url" class="pl-5"/>
+        </td>
         <td class="px-6 py-4 whitespace-nowrap">
           <span v-for="(rating, index) in row.data.ratings" :key="index">
             {{ rating > 0 ? rating.toFixed(1) : '—' }}
@@ -238,10 +242,10 @@ const downloadFilteredComparison = () => {
   </div>
 
   <div v-if="tableRows.length > 0" class="mb-8 flex justify-end gap-3">
-    <BackToTopButton variant="inline" />
-    <download-button @click="downloadComparison" text="Download Comparison" />
-    <download-button @click="downloadFilteredComparison" text="Download Filtered Comparison" />
+    <BackToTopButton variant="inline"/>
+    <download-button text="Download Comparison" @click="downloadComparison"/>
+    <download-button text="Download Filtered Comparison" @click="downloadFilteredComparison"/>
   </div>
 
-  <BackToTopButton />
+  <BackToTopButton/>
 </template>

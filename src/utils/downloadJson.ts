@@ -1,11 +1,10 @@
-
 export function downloadJson(data: unknown, filename: string): void {
   const json = JSON.stringify(data, null, 2);
   if (json === undefined) {
     throw new Error("Unable to serialize data as JSON");
   }
 
-  const blob = new Blob([json], { type: "application/json" });
+  const blob = new Blob([json], {type: "application/json"});
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
 

@@ -1,8 +1,8 @@
-<script setup lang="ts">
-import type { ModList } from "@/types/ModList.ts";
-import type { ModListItem } from "@/types/ModListItem.ts";
+<script lang="ts" setup>
+import type {ModList} from "@/types/ModList.ts";
+import type {ModListItem} from "@/types/ModListItem.ts";
 import ModListTable from "@/components/ModList/ModListTable.vue";
-import { computed } from "vue";
+import {computed} from "vue";
 import {downloadJson} from "@/utils/downloadJson.ts";
 import BackToTopButton from "@/components/UI/BackToTopButton.vue";
 import DownloadButton from "@/components/UI/DownloadButton.vue";
@@ -29,7 +29,7 @@ const submitRatings = () => {
 
   const exportPayload = Array.isArray(props.modList)
     ? ratedItems
-    : { items: ratedItems }
+    : {items: ratedItems}
 
   downloadJson(exportPayload, `modlist-rated-${new Date().toISOString().slice(0, 10)}.json`);
 }
@@ -40,13 +40,14 @@ const submitRatings = () => {
     <!-- Header with item count badge -->
     <div class="flex items-center justify-between mb-3">
       <h2 class="text-xl font-semibold text-gray-800">Mod List</h2>
-      <span class="px-2.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 rounded-full border border-gray-200">
+      <span
+        class="px-2.5 py-0.5 text-xs font-medium bg-gray-100 text-gray-600 rounded-full border border-gray-200">
         {{ items.length }} {{ items.length === 1 ? 'mod' : 'mods' }}
       </span>
     </div>
 
     <!-- Mod List Table -->
-    <ModListTable :items="items" />
+    <ModListTable :items="items"/>
 
     <!-- Action bar below the table -->
     <div v-if="items.length > 0" class="mt-4 flex items-center justify-between">
@@ -55,12 +56,12 @@ const submitRatings = () => {
       </p>
 
       <div class="flex items-center gap-3">
-        <BackToTopButton variant="inline" />
+        <BackToTopButton variant="inline"/>
 
-        <download-button @click="submitRatings" text="Submit & Export Ratings" />
+        <download-button text="Submit & Export Ratings" @click="submitRatings"/>
       </div>
     </div>
 
-    <BackToTopButton />
+    <BackToTopButton/>
   </div>
 </template>

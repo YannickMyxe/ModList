@@ -235,13 +235,16 @@ const filteredRows = computed(() => {
     </div>
     <div class="flex flex-col gap-3">
       <div class="flex flex-wrap items-center justify-between gap-3">
-        <YInputWithLabel type="text" label="Modpack Name" id="name" v-model="modpackTitle"></YInputWithLabel>
-        <YInputWithLabel type="text" label="Modpack Version" id="version" v-model="modpackVersion"></YInputWithLabel>
+        <YInputWithLabel id="name" v-model="modpackTitle" label="Modpack Name"
+                         type="text"></YInputWithLabel>
+        <YInputWithLabel id="version" v-model="modpackVersion" label="Modpack Version"
+                         type="text"></YInputWithLabel>
       </div>
       <label for="summary">Add an optional changelog summary above the list of changes. You can use
         Markdown. After downloading the file you can still change anything you want.</label>
-      <textarea id="summary" class="p-3 rounded-md border border-b-gray-400" cols="30"
-                name="summary" placeholder="Insert changelog summary here ..." rows="10" v-model="changelogSummary">
+      <textarea id="summary" v-model="changelogSummary" class="p-3 rounded-md border border-b-gray-400"
+                cols="30" name="summary" placeholder="Insert changelog summary here ..."
+                rows="10">
       </textarea>
     </div>
 
@@ -253,8 +256,9 @@ const filteredRows = computed(() => {
     <div class="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-xs mb-9">
       <y-table :head="tableHeaders">
         <template #header>
-          <th :aria-sort="sortBy === 'name'? sortDirection === 'asc'? 'ascending' : 'descending': undefined"
-              class="px-6 py-3.5 text-lg" scope="col">
+          <th
+            :aria-sort="sortBy === 'name'? sortDirection === 'asc'? 'ascending' : 'descending': undefined"
+            class="px-6 py-3.5 text-lg" scope="col">
             <button @click="setSort('name')">Mod</button>
             <span aria-hidden="true">
               {{ sortBy === 'name' ? (sortDirection === 'asc' ? '↑' : '↓') : '↕' }}
@@ -266,8 +270,9 @@ const filteredRows = computed(() => {
           <th class="px-6 py-3.5 text-lg" scope="col">
             <button>New Version</button>
           </th>
-          <th :aria-sort="sortBy === 'status'? sortDirection === 'asc'? 'ascending' : 'descending': undefined"
-              class="px-6 py-3.5 text-lg" scope="col">
+          <th
+            :aria-sort="sortBy === 'status'? sortDirection === 'asc'? 'ascending' : 'descending': undefined"
+            class="px-6 py-3.5 text-lg" scope="col">
             <button @click="setSort('status')">Status</button>
             <span aria-hidden="true">
               {{ sortBy === 'status' ? (sortDirection === 'asc' ? '↑' : '↓') : '↕' }}

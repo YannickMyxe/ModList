@@ -1,7 +1,7 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import DownloadSvg from "@/components/UI/svg/download-svg.vue";
-import YButton from "@/components/UI/YButton.vue";
 import type {ButtonType} from "@/components/UI/YButton.vue";
+import YButton from "@/components/UI/YButton.vue";
 
 const props = withDefaults(defineProps<{
   disabled?: boolean;
@@ -27,20 +27,20 @@ const onClick = (event: MouseEvent): void => {
 
 <template>
   <y-button
-    :type="props.type"
-    @click="onClick"
     :disabled="props.disabled"
+    :type="props.type"
     variant="primary"
+    @click="onClick"
   >
     <template v-if="props.iconPosition === 'left'">
-      <download-svg />
-      <slot v-if="$slots.default" />
+      <download-svg/>
+      <slot v-if="$slots.default"/>
       <template v-else>{{ props.text }}</template>
     </template>
     <template v-else>
-      <slot v-if="$slots.default" />
+      <slot v-if="$slots.default"/>
       <template v-else>{{ props.text }}</template>
-      <download-svg />
+      <download-svg/>
     </template>
   </y-button>
 </template>
