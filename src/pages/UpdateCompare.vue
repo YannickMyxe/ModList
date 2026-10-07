@@ -8,6 +8,7 @@ import BackToTopButton from "@/components/UI/BackToTopButton.vue";
 import DownloadButton from "@/components/UI/DownloadButton.vue";
 import ModUrl from "@/components/ModList/ModUrl.vue";
 import YMultiSelect from "@/components/UI/YMultiSelect.vue";
+import YInputWithLabel from "@/components/UI/YInputWithLabel.vue";
 
 type UpdatedMod = {
   previous: ModListItem;
@@ -64,9 +65,17 @@ const markdownEscape = (value: string): string =>
 const modLink = (item: ModListItem): string =>
   `[${markdownEscape(item.name)}](${item.url.replace(/[()\\\s]/g, "\\$&")})`;
 
+const changelogSummary = ref("");
+const modpackTitle = ref("");
+const modpackVersion = ref("");
+
 const changelog = computed(() => {
   const result = changes.value;
   if (!result) return "";
+
+  const title = modpackTitle.value.trim() || "Mod list changes";
+  const version = modpackVersion.value.trim();
+  const summary = changelogSummary.value.trim();
 
   const sections = [
     ["Added", result.added.map(item => `- ${modLink(item)} (v${markdownEscape(item.version)})`)],
@@ -76,8 +85,11 @@ const changelog = computed(() => {
   ] as const;
 
   return [
-    "# Mod list changes",
+    `# ${markdownEscape(title)}`,
+    ...(version ? ["", `**Version:** ${markdownEscape(version)}`] : []),
+    ...(summary ? ["", summary] : []),
     "",
+    ...(summary ? ["## Summary", "", summary, ""] : []),
     ...sections.flatMap(([title, items]) => [
       `## ${title} (${items.length})`,
       "",
@@ -94,8 +106,11 @@ const downloadChangelog = (): void => {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
 
+  const packName = modpackTitle.value ?? "modlist-changelog";
+  const version = modpackVersion.value ?? "";
+
   link.href = url;
-  link.download = `modlist-changelog-${new Date().toISOString().slice(0, 10)}.md`;
+  link.download = `${packName}-${version}.md`;
   document.body.appendChild(link);
   link.click();
   link.remove();
@@ -215,10 +230,15 @@ const filteredRows = computed(() => {
                       @click="downloadChangelog"/>
     </div>
     <div class="flex flex-col gap-3">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <YInputWithLabel type="text" label="Modpack Name" id="name" v-model="modpackTitle"></YInputWithLabel>
+        <YInputWithLabel type="text" label="Modpack Version" id="version" v-model="modpackVersion"></YInputWithLabel>
+      </div>
       <label for="summary">Add an optional changelog summary above the list of changes. You can use
         Markdown. After downloading the file you can still change anything you want.</label>
       <textarea id="summary" class="p-3 rounded-md border border-b-gray-400" cols="30"
-                name="summary" placeholder="Insert changelog summary here ..." rows="10"></textarea>
+                name="summary" placeholder="Insert changelog summary here ..." rows="10" v-model="changelogSummary">
+      </textarea>
     </div>
 
     <div>
