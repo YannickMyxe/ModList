@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import {computed, ref} from "vue";
 import type {ModList} from "@/types/ModList.ts";
 import type {ModListItem} from "@/types/ModListItem.ts";
@@ -31,10 +31,10 @@ type ModRow = {
 };
 
 const statusOptions: { label: string, value: string, }[] = [
-  { label: "Added", value: "Added" },
-  { label: "Removed", value: "Removed" },
-  { label: "Updated", value: "Updated" },
-  { label: "No changes", value: "No changes" },
+  {label: "Added", value: "Added"},
+  {label: "Removed", value: "Removed"},
+  {label: "Updated", value: "Updated"},
+  {label: "No changes", value: "No changes"},
 ];
 
 const oldModList = ref<ModList | null>(null);
@@ -144,37 +144,66 @@ const modRows = computed<ModRow[]>(() => {
         status,
       } as ModRow
     })
-    .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }))
+    .sort((a, b) => a.name.localeCompare(b.name, undefined, {sensitivity: "base"}))
 });
 
 const selectedStatuses = ref<string[]>([]);
-const filteredRows = computed(() => {
-  if (selectedStatuses.value.length === 0) return modRows.value;
+type SortBy = "name" | "status";
+type SortDirection = "asc" | "desc";
 
-  return modRows.value.filter(row =>
-    selectedStatuses.value.includes(row.status)
-  );
+const sortBy = ref<SortBy>("name");
+const sortDirection = ref<SortDirection>("asc");
+
+const statusOrder: Record<ModStatus, number> = {
+  Added: 0,
+  Updated: 1,
+  Removed: 2,
+  "No changes": 3,
+};
+const setSort = (column: SortBy): void => {
+  if (sortBy.value === column) {
+    sortDirection.value = sortDirection.value === "asc" ? "desc" : "asc";
+  } else {
+    sortBy.value = column;
+    sortDirection.value = "asc";
+  }
+};
+
+const filteredRows = computed(() => {
+  const rows = selectedStatuses.value.length
+    ? modRows.value.filter(row => selectedStatuses.value.includes(row.status))
+    : modRows.value;
+
+  return [...rows].sort((a, b) => {
+    const comparison = sortBy.value === "status"
+      ? statusOrder[a.status] - statusOrder[b.status]
+      || a.name.localeCompare(b.name, undefined, {sensitivity: "base"})
+      : a.name.localeCompare(b.name, undefined, {sensitivity: "base"});
+
+    return sortDirection.value === "asc" ? comparison : -comparison;
+  });
 });
 </script>
 
 <template>
   <h2 class="text-3xl">Compare 2 versions of modlist</h2>
-  <p>Here you can compare 2 versions of a modlist and see what changed. See what is removed, added, updated.</p>
+  <p>Here you can compare 2 versions of a modlist and see what changed. See what is removed, added,
+    updated.</p>
   <p>Use the changelog generator to generate a MD template which you can use as your changelog.</p>
 
   <div class="flex w-full flex-col gap-3 md:flex-row">
     <ModListUpload
-      class="mt-5 min-w-0 flex-1"
       :max-files="1"
-      text="Upload the old modlist"
+      class="mt-5 min-w-0 flex-1"
       dropzone-text="Upload Old modlist"
+      text="Upload the old modlist"
       @mod-list-uploaded="onOldModListUploaded"
     />
     <ModListUpload
-      class="mt-5 min-w-0 flex-1"
       :max-files="1"
-      text="Upload the new modlist"
+      class="mt-5 min-w-0 flex-1"
       dropzone-text="Upload New modlist"
+      text="Upload the new modlist"
       @mod-list-uploaded="onNewModListUploaded"
     />
   </div>
@@ -182,40 +211,71 @@ const filteredRows = computed(() => {
   <section v-if="changes" class="mt-4 space-y-8">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <h3 class="text-2xl font-semibold">Changes between modlists</h3>
-      <DownloadButton :disabled="amountOfChanges === 0" text="Download Markdown Changelog" @click="downloadChangelog" />
+      <DownloadButton :disabled="amountOfChanges === 0" text="Download Markdown Changelog"
+                      @click="downloadChangelog"/>
     </div>
     <div class="flex flex-col gap-3">
-      <label for="summary">Add an optional changelog summary above the list of changes. You can use Markdown. After downloading the file you can still change anything you want.</label>
-      <textarea class="p-3 rounded-md border border-b-gray-400" name="summary" id="summary" cols="30" rows="10" placeholder="Insert changelog summary here ..."></textarea>
+      <label for="summary">Add an optional changelog summary above the list of changes. You can use
+        Markdown. After downloading the file you can still change anything you want.</label>
+      <textarea id="summary" class="p-3 rounded-md border border-b-gray-400" cols="30"
+                name="summary" placeholder="Insert changelog summary here ..." rows="10"></textarea>
     </div>
 
     <div>
-      <YMultiSelect :items="statusOptions" label="Select status to show" placeholder="All statuses" v-model="selectedStatuses" ></YMultiSelect>
+      <YMultiSelect v-model="selectedStatuses" :items="statusOptions" label="Select status to show"
+                    placeholder="All statuses"></YMultiSelect>
     </div>
 
     <div class="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-xs mb-9">
-    <y-table :head="tableHeaders">
-      <tr v-if="filteredRows.length === 0">
-        <td class="w-full text-center text-lg py-5" :colspan="tableHeaders.length">No mods found.</td>
-      </tr>
-      <tr v-else-if="amountOfChanges === 0">
-        <td class="w-full text-center text-lg py-5" :colspan="tableHeaders.length">No changes found.</td>
-      </tr>
-      <tr v-else v-for="row in filteredRows" class="hover:bg-gray-50/80 transition-colors" :key="row.url">
-        <td class="px-6 py-4 whitespace-nowrap">
-          <mod-url :url="row.url" :label="row.name" />
-        </td>
-        <td class="px-6 py-4 whitespace-nowrap">{{row.oldVersion?? "-"}}</td>
-        <td class="px-6 py-4 whitespace-nowrap">{{row.newVersion?? "-"}}</td>
-        <td class="px-6 py-4 whitespace-nowrap">{{row.status}}</td>
-      </tr>
-    </y-table>
+      <y-table :head="tableHeaders">
+        <template #header>
+          <th :aria-sort="sortBy === 'name'? sortDirection === 'asc'? 'ascending' : 'descending': undefined"
+              class="px-6 py-3.5 text-lg" scope="col">
+            <button @click="setSort('name')">Mod</button>
+            <span aria-hidden="true">
+              {{ sortBy === 'name' ? (sortDirection === 'asc' ? '↑' : '↓') : '↕' }}
+            </span>
+          </th>
+          <th class="px-6 py-3.5 text-lg" scope="col">
+            <button>Old-Version</button>
+          </th>
+          <th class="px-6 py-3.5 text-lg" scope="col">
+            <button>New Version</button>
+          </th>
+          <th :aria-sort="sortBy === 'status'? sortDirection === 'asc'? 'ascending' : 'descending': undefined"
+              class="px-6 py-3.5 text-lg" scope="col">
+            <button @click="setSort('status')">Status</button>
+            <span aria-hidden="true">
+              {{ sortBy === 'status' ? (sortDirection === 'asc' ? '↑' : '↓') : '↕' }}
+            </span>
+          </th>
+        </template>
+        <tr v-if="filteredRows.length === 0">
+          <td :colspan="tableHeaders.length" class="w-full text-center text-lg py-5">No mods
+            found.
+          </td>
+        </tr>
+        <tr v-else-if="amountOfChanges === 0">
+          <td :colspan="tableHeaders.length" class="w-full text-center text-lg py-5">No changes
+            found.
+          </td>
+        </tr>
+        <tr v-for="row in filteredRows" v-else :key="row.url"
+            class="hover:bg-gray-50/80 transition-colors">
+          <td class="px-6 py-4 whitespace-nowrap">
+            <mod-url :label="row.name" :url="row.url"/>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">{{ row.oldVersion ?? "-" }}</td>
+          <td class="px-6 py-4 whitespace-nowrap">{{ row.newVersion ?? "-" }}</td>
+          <td class="px-6 py-4 whitespace-nowrap">{{ row.status }}</td>
+        </tr>
+      </y-table>
     </div>
 
     <div v-if="modRows.length > 0" class="mb-8 flex justify-end">
-      <BackToTopButton variant="inline" />
+      <BackToTopButton variant="inline"/>
     </div>
   </section>
 
-  <BackToTopButton />
+  <BackToTopButton/>
 </template>
