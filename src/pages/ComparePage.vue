@@ -2,10 +2,11 @@
 import ModListUpload from "@/components/ModList/ModListUpload.vue";
 import YButton from "@/components/UI/YButton.vue";
 import type {ModList} from "@/types/ModList.ts";
-import {computed, onMounted, onUnmounted, ref} from "vue";
+import {computed, ref} from "vue";
 import YTable from "@/components/UI/YTable.vue";
 import TableFilter from "@/components/UI/TableFilter.vue";
 import YSelect from "@/components/UI/YSelect.vue";
+import BackToTopButton from "@/components/UI/BackToTopButton.vue";
 import {downloadJson} from "@/utils/downloadJson.ts";
 import type {ComparisonItem} from "@/types/ModListComparison.ts";
 import {createModListComparison} from "@/utils/modListComparison.ts";
@@ -38,7 +39,6 @@ const tableRows = ref<TableRow[]>([]);
 const searchQuery = ref("");
 const filterRating = ref<number>(-1);
 const ratingStrictness = ref<RatingStrictness>("higher");
-const showBackToTop = ref(false);
 
 const ratingOptions: ({ label: string, value: number })[] = [
   {label: 'All', value: -1},
@@ -140,22 +140,6 @@ const onUpload = (lists: ModList[]): void => {
 const clearData = () => {
   tableRows.value = [];
 }
-
-const handleScroll = () => {
-  showBackToTop.value = window.scrollY > 300;
-};
-
-const scrollToTop = () => {
-  window.scrollTo({top: 0, behavior: "smooth"});
-};
-
-onMounted(() => {
-  window.addEventListener("scroll", handleScroll, {passive: true});
-});
-
-onUnmounted(() => {
-  window.removeEventListener("scroll", handleScroll);
-});
 
 const downloadComparison = () => {
   if (tableRows.value.length === 0) return;
@@ -260,18 +244,7 @@ const downloadFilteredComparison = () => {
   </div>
 
   <div v-if="tableRows.length > 0" class="mb-8 flex justify-end gap-3">
-    <button
-      class="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
-      type="button"
-      @click="scrollToTop"
-    >
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-           xmlns="http://www.w3.org/2000/svg">
-        <path d="M5 10l7-7m0 0l7 7m-7-7v18" stroke-linecap="round" stroke-linejoin="round"
-              stroke-width="2"/>
-      </svg>
-      Back to top
-    </button>
+    <BackToTopButton variant="inline" />
     <button
       class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-xs transition-colors cursor-pointer"
       type="button"
@@ -298,27 +271,5 @@ const downloadFilteredComparison = () => {
     </button>
   </div>
 
-  <Transition
-    enter-active-class="transition duration-200 ease-out"
-    enter-from-class="opacity-0 translate-y-2"
-    enter-to-class="opacity-100 translate-y-0"
-    leave-active-class="transition duration-150 ease-in"
-    leave-from-class="opacity-100 translate-y-0"
-    leave-to-class="opacity-0 translate-y-2"
-  >
-    <button
-      v-show="showBackToTop"
-      aria-label="Back to top"
-      class="fixed bottom-6 right-6 p-3 bg-white/95 hover:bg-white text-gray-700 hover:text-blue-600 border border-gray-200 rounded-full shadow-lg backdrop-blur-xs transition-all hover:shadow-xl hover:-translate-y-0.5 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 z-50"
-      title="Back to top"
-      type="button"
-      @click="scrollToTop"
-    >
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-           xmlns="http://www.w3.org/2000/svg">
-        <path d="M5 10l7-7m0 0l7 7m-7-7v18" stroke-linecap="round" stroke-linejoin="round"
-              stroke-width="2.5"/>
-      </svg>
-    </button>
-  </Transition>
+  <BackToTopButton />
 </template>

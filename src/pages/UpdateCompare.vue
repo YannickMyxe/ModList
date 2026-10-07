@@ -4,6 +4,7 @@ import type {ModList} from "@/types/ModList.ts";
 import type {ModListItem} from "@/types/ModListItem.ts";
 import ModListUpload from "@/components/ModList/ModListUpload.vue";
 import YTable from "@/components/UI/YTable.vue";
+import BackToTopButton from "@/components/UI/BackToTopButton.vue";
 
 type UpdatedMod = {
   previous: ModListItem;
@@ -179,10 +180,10 @@ const modRows = computed<ModRow[]>(() => {
 
     <div class="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-xs mb-9">
     <y-table :head="tableHeaders">
-      <tr v-if="amountOfChanges === 0" >
-        <td class="w-full text-center text-lg py-5" :colspan="tableHeaders.length">No changes found.</td>
+      <tr v-if="modRows.length === 0">
+        <td class="w-full text-center text-lg py-5" :colspan="tableHeaders.length">No mods found.</td>
       </tr>
-      <tr v-else v-for="row in modRows" class="hover:bg-gray-50/80 transition-colors" :key="row.url">
+      <tr v-for="row in modRows" class="hover:bg-gray-50/80 transition-colors" :key="row.url">
         <td class="px-6 py-4 whitespace-nowrap"><a
           :href="row.url"
           class="px-5 inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 hover:underline transition-colors"
@@ -198,5 +199,11 @@ const modRows = computed<ModRow[]>(() => {
       </tr>
     </y-table>
     </div>
+
+    <div v-if="modRows.length > 0" class="mb-8 flex justify-end">
+      <BackToTopButton variant="inline" />
+    </div>
   </section>
+
+  <BackToTopButton />
 </template>
