@@ -5,6 +5,7 @@ import ModListTable from "@/components/ModList/ModListTable.vue";
 import { computed } from "vue";
 import {downloadJson} from "@/utils/downloadJson.ts";
 import BackToTopButton from "@/components/UI/BackToTopButton.vue";
+import DownloadButton from "@/components/UI/DownloadButton.vue";
 
 const props = defineProps<{
   modList?: ModList | ModListItem[] | null
@@ -56,17 +57,7 @@ const submitRatings = () => {
       <div class="flex items-center gap-3">
         <BackToTopButton variant="inline" />
 
-        <!-- Submit & Export button -->
-        <button
-          type="button"
-          @click="submitRatings"
-          class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-xs transition-colors cursor-pointer"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-          </svg>
-          Submit & Export Ratings
-        </button>
+        <download-button @click="submitRatings" text="Submit & Export Ratings" />
       </div>
     </div>
 

@@ -5,6 +5,7 @@ import type {ModListItem} from "@/types/ModListItem.ts";
 import ModListUpload from "@/components/ModList/ModListUpload.vue";
 import YTable from "@/components/UI/YTable.vue";
 import BackToTopButton from "@/components/UI/BackToTopButton.vue";
+import DownloadButton from "@/components/UI/DownloadButton.vue";
 
 type UpdatedMod = {
   previous: ModListItem;
@@ -147,14 +148,14 @@ const modRows = computed<ModRow[]>(() => {
     <ModListUpload
       class="mt-5 min-w-0 flex-1"
       :max-files="1"
-      label="Upload the old modlist"
+      text="Upload the old modlist"
       dropzone-text="Upload Old modlist"
       @mod-list-uploaded="onOldModListUploaded"
     />
     <ModListUpload
       class="mt-5 min-w-0 flex-1"
       :max-files="1"
-      label="Upload the new modlist"
+      text="Upload the new modlist"
       dropzone-text="Upload New modlist"
       @mod-list-uploaded="onNewModListUploaded"
     />
@@ -163,19 +164,7 @@ const modRows = computed<ModRow[]>(() => {
   <section v-if="changes" class="mt-8 space-y-8">
     <div class="flex flex-wrap items-center justify-between gap-3">
       <h3 class="text-2xl font-semibold">Changes between modlists</h3>
-      <button
-        @click="downloadChangelog"
-        :disabled="amountOfChanges === 0"
-        class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700 cursor-pointer
-         disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 disabled:hover:bg-gray-400"
-      >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-             xmlns="http://www.w3.org/2000/svg">
-          <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-linecap="round" stroke-linejoin="round"
-                stroke-width="2"/>
-        </svg>
-        Download Markdown changelog
-      </button>
+      <DownloadButton text="Download Markdown Changelog" @click="downloadChangelog" />
     </div>
 
     <div class="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-xs mb-9">

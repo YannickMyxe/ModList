@@ -10,6 +10,7 @@ import BackToTopButton from "@/components/UI/BackToTopButton.vue";
 import {downloadJson} from "@/utils/downloadJson.ts";
 import type {ComparisonItem} from "@/types/ModListComparison.ts";
 import {createModListComparison} from "@/utils/modListComparison.ts";
+import DownloadButton from "@/components/UI/DownloadButton.vue";
 
 const modLists = ref<ModList[]>([]);
 
@@ -166,8 +167,8 @@ const downloadFilteredComparison = () => {
   <h1 class="text-3xl">Compare multiple ratings and see the differences</h1>
   <ModListUpload :max-files="null" @mod-list-uploaded="onUpload"/>
   <div class="flex justify-between">
-    <YButton class="my-5" label="Compare ratings" @click="compareRatings"/>
-    <YButton class="my-5" label="Clear Data" @click="clearData"/>
+    <YButton class="my-5" text="Compare ratings" @click="compareRatings"/>
+    <YButton class="my-5" text="Clear Data" @click="clearData"/>
   </div>
 
   <div v-if="tableRows.length > 0" class="mt-6">
@@ -245,30 +246,8 @@ const downloadFilteredComparison = () => {
 
   <div v-if="tableRows.length > 0" class="mb-8 flex justify-end gap-3">
     <BackToTopButton variant="inline" />
-    <button
-      class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-xs transition-colors cursor-pointer"
-      type="button"
-      @click="downloadComparison"
-    >
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-           xmlns="http://www.w3.org/2000/svg">
-        <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-linecap="round" stroke-linejoin="round"
-              stroke-width="2"/>
-      </svg>
-      Download Comparison
-    </button>
-    <button
-      class="inline-flex items-center gap-2 px-4 py-2 bg-sky-800 hover:bg-sky-700 text-white text-sm font-medium rounded-lg shadow-xs transition-colors cursor-pointer"
-      type="button"
-      @click="downloadFilteredComparison"
-    >
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-           xmlns="http://www.w3.org/2000/svg">
-        <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-linecap="round" stroke-linejoin="round"
-              stroke-width="2"/>
-      </svg>
-      Download Filtered Comparison
-    </button>
+    <download-button @click="downloadComparison"text="Download Comparison" />
+    <download-button @click="downloadFilteredComparison" text="Download Filtered Comparison" />
   </div>
 
   <BackToTopButton />
