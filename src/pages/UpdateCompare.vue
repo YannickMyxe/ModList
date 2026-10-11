@@ -89,7 +89,6 @@ const changelog = computed(() => {
     ...(version ? ["", `**Version:** ${markdownEscape(version)}`] : []),
     ...(summary ? ["", summary] : []),
     "",
-    ...(summary ? ["## Summary", "", summary, ""] : []),
     ...sections.flatMap(([title, items]) => [
       `## ${title} (${items.length})`,
       "",
