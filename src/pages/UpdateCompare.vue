@@ -95,6 +95,9 @@ const changelog = computed(() => {
       ...(items.length > 0 ? items : ["- None"]),
       "",
     ]),
+    `---`,
+    ``,
+    `This changelog was made with [yannickmyxe.github.io/ModList](https://yannickmyxe.github.io/ModList)`
   ].join("\n").trimEnd() + "\n";
 });
 
